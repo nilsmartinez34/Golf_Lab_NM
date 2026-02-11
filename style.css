@@ -730,7 +730,7 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 .swing-dashboard-compact {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0px;
 }
 
 /* Horizontal Speed Control */
@@ -945,7 +945,7 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     display: flex;
     align-items: center;
     overflow-x: auto;
-    padding: 5px 0;
+    padding: 0;
 }
 
 .club-belt {
