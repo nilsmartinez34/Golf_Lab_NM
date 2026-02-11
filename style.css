@@ -70,9 +70,11 @@ body {
 
 .metric-container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    gap: 8px;
 }
 
 .metric-group {
@@ -190,9 +192,9 @@ body:has(#putt-content:not([style*="display: none"])) .bottom-controls {
     flex: none;
 }
 
-/* SWING MODE SPECIFIC LAYOUT (25/50/25) */
+/* SWING MODE SPECIFIC LAYOUT (20/50/30) */
 body:has(#swing-content:not([style*="display: none"])) .top-metrics {
-    height: 25vh;
+    height: 20vh;
 }
 
 body:has(#swing-content:not([style*="display: none"])) .gameplay-zone {
@@ -201,7 +203,7 @@ body:has(#swing-content:not([style*="display: none"])) .gameplay-zone {
 }
 
 body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
-    height: 25vh;
+    height: 30vh;
     flex: none;
 }
 
@@ -653,6 +655,8 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     justify-content: space-between;
     padding: 8px 12px;
     gap: 8px;
+    overflow-x: auto;
+    overflow-y: auto;
 }
 
 .swing-dashboard-compact {
