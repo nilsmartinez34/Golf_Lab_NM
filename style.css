@@ -137,7 +137,7 @@ body {
 /* PUTT METRICS SPECIFIC */
 #putt-metrics-header {
     flex-direction: column;
-    padding: 5px 20px;
+    padding: 5px 10px;
     height: 100%;
     justify-content: center;
     gap: 2px;
@@ -817,10 +817,11 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 }
 
 .angle-btn {
-    width: 28px;
-    height: 28px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.08);
+    /* More subtle glass */
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 50%;
     color: white;
     font-size: 18px;
@@ -829,12 +830,23 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275);
+    /* Bouncy transition */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.angle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    border-color: var(--accent);
 }
 
 .angle-btn:active {
     background: var(--accent);
     color: #000;
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .angle-value {
@@ -846,23 +858,38 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 }
 
 .action-btn-punchy-compact {
-    padding: 8px 16px;
+    padding: 8px 24px;
     height: 100%;
-    background: linear-gradient(135deg, var(--accent), #22C55E);
+    /* Fill container height */
+    min-height: 44px;
+    /* Ensure touch target size */
+    background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+    /* Green Gradient */
     border: none;
-    border-radius: 10px;
-    color: #000;
-    font-weight: 900;
-    font-size: 14px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 800;
+    font-size: 16px;
+    /* Slightly larger text */
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     cursor: pointer;
-    box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
-    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+    /* Glow effect */
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn-punchy-compact:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
+    background: linear-gradient(135deg, #4ADE80 0%, #22C55E 100%);
+    /* Brighter on hover */
 }
 
 .action-btn-punchy-compact:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
+    box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3);
 }
 
 /* Club Belt */
@@ -1079,25 +1106,34 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     color: #FFF;
 }
 
-/* PUTT Rect Button (Punchy) */
+/* PUTT Rect Button (Punchy) - Modernized */
 .action-btn-putt-rect {
     height: 50px;
-    padding: 0 25px;
-    background: linear-gradient(135deg, var(--accent), #22C55E);
-    color: #000;
+    padding: 0 30px;
+    background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+    color: white;
     border: none;
-    border-radius: 12px;
-    font-weight: 900;
-    font-size: 16px;
+    border-radius: 14px;
+    /* Softer corners */
+    font-weight: 800;
+    font-size: 18px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     cursor: pointer;
-    box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
-    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn-putt-rect:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
+    background: linear-gradient(135deg, #4ADE80 0%, #22C55E 100%);
 }
 
 .action-btn-putt-rect:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
+    box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3);
 }
 
 /* Modal and Base Styles Continue... */
@@ -1257,8 +1293,80 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
         min-width: 60px;
     }
 
-    .distance-adjust-group {
-        gap: 10px;
-        padding: 5px 10px;
+    padding: 5px 10px;
+}
+}
+
+/* Specific Mobile Portrait Optimizations */
+@media (max-width: 450px) {
+
+    /* Prevent SWING button cropping */
+    #swing-footer {
+        overflow-x: hidden;
+        /* Prevent horizontal scroll acting weirdly */
+        padding: 5px 8px;
+    }
+
+    .swing-dashboard-compact {
+        gap: 8px;
+        width: 100%;
+    }
+
+    .h-controls-compact {
+        gap: 4px;
+        /* Tighter gap */
+        flex: 1;
+        justify-content: space-between;
+    }
+
+    .angle-adjust-group {
+        padding: 2px 6px;
+        /* Smaller padding */
+        gap: 4px;
+    }
+
+    .angle-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+    }
+
+    .action-btn-punchy-compact {
+        padding: 0 12px;
+        /* Less horizontal padding */
+        font-size: 14px;
+        min-height: 40px;
+        letter-spacing: 0.5px;
+    }
+
+    /* HUD adjustments to prevent cropping/overlap */
+    .hud {
+        padding: 10px 12px;
+        min-width: 110px;
+    }
+
+    .bottom-left {
+        left: 10px;
+        top: 15px;
+    }
+
+    .bottom-right {
+        right: 10px;
+        top: 15px;
+    }
+
+    /* Metrics fit */
+    .metric-container {
+        gap: 4px;
+        justify-content: space-around;
+    }
+
+    .metric-item .value-group span:first-child {
+        font-size: 20px;
+        /* Slightly smaller */
+    }
+
+    .metric-item .label {
+        font-size: 9px;
     }
 }

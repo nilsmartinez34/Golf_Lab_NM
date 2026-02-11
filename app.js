@@ -20,7 +20,7 @@ const appState = {
     isAnimating: false,
 
     // NEW: History
-    history: []
+    history: JSON.parse(localStorage.getItem('golf_history')) || []
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -617,6 +617,7 @@ function initMainCanvas() {
             date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
         appState.history.unshift(item); // Newest first
+        localStorage.setItem('golf_history', JSON.stringify(appState.history));
     }
 
     function piece(val, unit) { return `${val.toFixed(1)} ${unit}`; }
