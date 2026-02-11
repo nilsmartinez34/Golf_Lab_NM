@@ -175,7 +175,10 @@ function initUI() {
         powerInput.oninput = (e) => {
             appState.power = parseFloat(e.target.value);
             document.getElementById('speed-label').textContent = `${appState.power} MPH`;
-            document.getElementById('speed-fill').style.height = `${(appState.power / 150) * 100}%`;
+            const fillElement = document.getElementById('speed-fill-h');
+            if (fillElement) {
+                fillElement.style.width = `${(appState.power / 150) * 100}%`;
+            }
         };
     }
     if (pathInput) {

@@ -147,47 +147,39 @@
         <!-- ZONE 3: FOOTER CONTROLS -->
         <footer class="bottom-controls">
             <div id="swing-footer" class="footer-segment">
-                <div class="swing-dashboard">
-                    <!-- Vertical Speed Control -->
-                    <div class="control-item speed-v">
-                        <span class="ctrl-label">SPEED</span>
-                        <div class="vertical-slider-track">
-                            <div id="speed-fill" class="speed-gauge-fill"></div>
-                            <input type="range" id="input-power" min="10" max="150" value="90" class="v-slider-input">
+                <div class="swing-dashboard-compact">
+                    <!-- Horizontal Speed Control -->
+                    <div class="control-item speed-h">
+                        <span class="ctrl-label-mini">SPEED</span>
+                        <div class="h-slider-container">
+                            <input type="range" id="input-power" min="10" max="150" value="90"
+                                class="h-slider-input speed-slider">
+                            <div id="speed-fill-h" class="speed-gauge-fill-h"></div>
                         </div>
-                        <span id="speed-label" class="ctrl-value">90 MPH</span>
-                    </div>
-
-                    <!-- Impact Visualization (Premium Feel) -->
-                    <div class="impact-viz">
-                        <canvas id="impactBallCanvas" width="80" height="80"></canvas>
+                        <span id="speed-label" class="ctrl-value-mini">90 MPH</span>
                     </div>
 
                     <!-- Horizontal Controls Area -->
-                    <div class="h-controls-area">
-                        <div class="h-control-row">
-                            <div class="control-item h-item">
-                                <span class="ctrl-label">PATH ANGLE</span>
-                                <input type="range" id="input-path" min="-20" max="20" value="0" step="0.5"
-                                    class="h-slider-input">
-                                <span id="path-label" class="ctrl-value">0°</span>
-                            </div>
-                            <div class="control-item h-item">
-                                <span class="ctrl-label">FACE ANGLE</span>
-                                <input type="range" id="input-face" min="-15" max="15" value="0" step="0.5"
-                                    class="h-slider-input">
-                                <span id="face-angle-label" class="ctrl-value">0°</span>
-                            </div>
+                    <div class="h-controls-compact">
+                        <div class="control-item h-item-compact">
+                            <span class="ctrl-label-mini">PATH</span>
+                            <input type="range" id="input-path" min="-20" max="20" value="0" step="0.5"
+                                class="h-slider-input">
+                            <span id="path-label" class="ctrl-value-mini">0°</span>
                         </div>
-                        <div class="h-control-row">
-                            <div class="control-item h-item">
-                                <span class="ctrl-label">ATTACK ANGLE</span>
-                                <input type="range" id="input-attack" min="-10" max="10" value="0" step="0.5"
-                                    class="h-slider-input">
-                                <span id="attack-label" class="ctrl-value">0°</span>
-                            </div>
-                            <button class="action-btn-punchy" id="btnSwing">SWING</button>
+                        <div class="control-item h-item-compact">
+                            <span class="ctrl-label-mini">FACE</span>
+                            <input type="range" id="input-face" min="-15" max="15" value="0" step="0.5"
+                                class="h-slider-input">
+                            <span id="face-angle-label" class="ctrl-value-mini">0°</span>
                         </div>
+                        <div class="control-item h-item-compact">
+                            <span class="ctrl-label-mini">ATTACK</span>
+                            <input type="range" id="input-attack" min="-10" max="10" value="0" step="0.5"
+                                class="h-slider-input">
+                            <span id="attack-label" class="ctrl-value-mini">0°</span>
+                        </div>
+                        <button class="action-btn-punchy-compact" id="btnSwing">SWING</button>
                     </div>
                 </div>
 

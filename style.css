@@ -175,6 +175,36 @@ body {
     overflow: hidden;
 }
 
+/* PUTTING MODE SPECIFIC LAYOUT (25/50/25) */
+body:has(#putt-content:not([style*="display: none"])) .top-metrics {
+    height: 25vh;
+}
+
+body:has(#putt-content:not([style*="display: none"])) .gameplay-zone {
+    height: 50vh;
+    flex: none;
+}
+
+body:has(#putt-content:not([style*="display: none"])) .bottom-controls {
+    height: 25vh;
+    flex: none;
+}
+
+/* SWING MODE SPECIFIC LAYOUT (25/50/25) */
+body:has(#swing-content:not([style*="display: none"])) .top-metrics {
+    height: 25vh;
+}
+
+body:has(#swing-content:not([style*="display: none"])) .gameplay-zone {
+    height: 50vh;
+    flex: none;
+}
+
+body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
+    height: 25vh;
+    flex: none;
+}
+
 #golfCanvas {
     width: 100%;
     height: 100%;
@@ -615,96 +645,114 @@ body {
     flex-direction: column;
 }
 
+/* SWING FOOTER STYLES (Compact Horizontal Layout) */
 #swing-footer {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 10px 15px;
+    justify-content: space-between;
+    padding: 8px 12px;
+    gap: 8px;
 }
 
-.swing-dashboard {
-    flex: 1;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding-bottom: 10px;
-}
-
-.control-item {
+.swing-dashboard-compact {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 5px;
+    gap: 10px;
 }
 
-.ctrl-label {
-    font-size: 10px;
-    font-weight: 900;
-    color: var(--text-secondary);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.ctrl-value {
-    font-size: 14px;
-    font-weight: 900;
-    color: var(--accent);
-    text-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
-}
-
-/* Vertical Speed Slider */
-.speed-v {
-    width: 70px;
-}
-
-.vertical-slider-track {
-    width: 24px;
-    height: 120px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.speed-gauge-fill {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    background: linear-gradient(to top, #22C55E, #EAB308, #EF4444);
-    box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
-    transition: height 0.1s;
-}
-
-.v-slider-input {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-90deg);
-    width: 120px;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 2;
-}
-
-/* Horizontal Controls Area */
-.h-controls-area {
-    flex: 1;
+/* Horizontal Speed Control */
+.speed-h {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 12px;
 }
 
-.h-control-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
+.ctrl-label-mini {
+    font-size: 9px;
+    font-weight: 900;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    min-width: 45px;
 }
 
-.h-item {
+.h-slider-container {
+    flex: 1;
+    position: relative;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.speed-gauge-fill-h {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #FACC15, var(--accent));
+    width: 60%;
+    /* Will be updated by JS */
+    transition: width 0.2s;
+    pointer-events: none;
+}
+
+.speed-slider {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+}
+
+.ctrl-value-mini {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 55px;
+    text-align: right;
+}
+
+/* Compact Horizontal Controls */
+.h-controls-compact {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.h-item-compact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+}
+
+.h-item-compact input[type="range"] {
+    width: 100%;
+}
+
+.action-btn-punchy-compact {
+    padding: 8px 16px;
+    height: 100%;
+    background: linear-gradient(135deg, var(--accent), #22C55E);
+    border: none;
+    border-radius: 10px;
+    color: #000;
+    font-weight: 900;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
+    transition: all 0.2s;
+}
+
+.action-btn-punchy-compact:active {
+    transform: scale(0.95);
+}
+
+/* Club Belt */
+.club-belt-container {
     flex: 1;
     align-items: flex-start;
 }
@@ -986,17 +1034,27 @@ body {
         font-size: 16px;
     }
 
-    .gameplay-zone {
-        max-height: 45vh;
-        /* Further reduced for safer fitting */
-    }
-
     .bottom-controls {
         height: auto;
         min-height: 15vh;
         max-height: 40vh;
         /* Allow it to take more space but not cover everything */
         overflow-y: auto;
+    }
+
+    /* Putting mode keeps its 25/50/25 proportions even on mobile */
+    body:has(#putt-content:not([style*="display: none"])) .top-metrics {
+        height: 25vh;
+        padding: 5px 10px;
+    }
+
+    body:has(#putt-content:not([style*="display: none"])) .gameplay-zone {
+        height: 50vh;
+    }
+
+    body:has(#putt-content:not([style*="display: none"])) .bottom-controls {
+        height: 25vh;
+        overflow-y: visible;
     }
 
     #swing-footer,
