@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Golf Lab NM</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- TABS NAVIGATION -->
+        <nav class="tabs-nav">
+            <button class="tab-link active" id="tab-swing">SWING</button>
+            <button class="tab-link" id="tab-putt">PUTT</button>
+        </nav>
+
+        <!-- ZONE 1: TOP METRICS (Dynamic based on tab) -->
+        <header class="top-metrics" id="main-metrics">
+            <div class="metric-container" id="swing-metrics-header">
+                <div class="metric-group">
+                    <div class="metric-item">
+                        <span class="label">CARRY</span>
+                        <div class="value-group"><span id="val-m1">--</span><span class="unit">M</span></div>
+                    </div>
+                    <div class="metric-item">
+                        <span class="label">TOTAL</span>
+                        <div class="value-group"><span id="val-m2">--</span><span class="unit">M</span></div>
+                    </div>
+                </div>
+                <div class="metric-group mid-metrics">
+                    <div class="metric-item">
+                        <span class="label">BACKSPIN</span>
+                        <div class="value-group"><span id="val-spin-back">--</span><span class="unit">RPM</span></div>
+                    </div>
+                    <div class="metric-item">
+                        <span class="label">SIDESPIN</span>
+                        <div class="value-group"><span id="val-spin-side">--</span><span class="unit">RPM</span></div>
+                    </div>
+                </div>
+                <div class="metric-group">
+                    <div class="metric-item">
+                        <span class="label">SMASH</span>
+                        <div class="value-group"><span id="val-smash">--</span></div>
+                    </div>
+                    <div class="metric-item">
+                        <span class="label">SIDE</span>
+                        <div class="value-group"><span id="val-m3">--</span><span class="unit" id="unit-m3">R</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metric-container" id="putt-metrics-header" style="display: none;">
+                <div class="metric-grid-top">
+                    <div class="metric-item">
+                        <span class="label">AIM</span>
+                        <div class="value-group"><span id="putt-val-aim">0,00</span><span class="unit"
+                                id="putt-unit-aim">m LEFT</span></div>
+                    </div>
+                    <div class="metric-item">
+                        <span class="label">PLAY AS</span>
+                        <div class="value-group"><span id="putt-val-playas">0,00</span><span class="unit">m
+                                EFFORT</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-item full-width">
+                    <span class="label">APEX</span>
+                    <div class="value-group"><span id="putt-val-apex">0,00 / 0,00</span><span class="unit">X / Y</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ZONE 2: GAMEPLAY -->
+        <main class="gameplay-zone">
+            <!-- COMMON CANVAS (Displays differ based on mode) -->
+            <canvas id="golfCanvas"></canvas>
+
+            <!-- SWING OVERLAYS -->
+            <div id="swing-content">
+                <div class="hud bottom-left" id="hud-swing-left">
+                    <span class="hud-title">SPEED</span>
+                    <div class="hud-item"><span class="hud-label">CLUB</span><span class="hud-value"
+                            id="hud-club-speed">--</span><span class="hud-unit">MPH</span></div>
+                    <div class="hud-item"><span class="hud-label">BALL</span><span class="hud-value"
+                            id="hud-ball-speed">--</span><span class="hud-unit">MPH</span></div>
+                </div>
+                <div class="hud bottom-right" id="hud-swing-right">
+                    <span class="hud-title">IMPACT</span>
+                    <div class="hud-item"><span class="hud-label">PATH ANGLE</span><span class="hud-value"
+                            id="hud-path">--</span></div>
+                    <div class="hud-item"><span class="hud-label">FACE TO PATH</span><span class="hud-value"
+                            id="hud-face">--</span></div>
+                </div>
+
+                <div class="overlay school-controls">
+                    <!-- This div is now empty after moving its contents to the footer -->
+                </div>
+            </div>
+
+            <!-- PUTT OVERLAYS -->
+            <div id="putt-content" style="display: none;">
+                <!-- Top Buttons -->
+                <button class="circle-btn back-btn" id="btnPuttBack">←</button>
+                <div class="putt-actions-top">
+                    <button class="circle-btn status-btn active">✓</button>
+                    <button class="circle-btn menu-btn">☰</button>
+                </div>
+
+                <!-- Labels -->
+                <div class="putt-sub-overlay">
+                    <span class="overlay-label top-left">AIM POINT</span>
+                    <span class="overlay-label top-right">HISTORY</span>
+                </div>
+
+                <!-- Slope Controls -->
+                <div class="side-control left">
+                    <span class="side-label">SLOPE Y</span>
+                    <button class="adjust-btn" id="btn-slope-y-plus">+</button>
+                    <span class="side-value" id="val-slope-y">0,00°</span>
+                    <button class="adjust-btn" id="btn-slope-y-minus">-</button>
+                </div>
+
+                <div class="side-control right">
+                    <span class="side-label">SLOPE X</span>
+                    <button class="adjust-btn" id="btn-slope-x-plus">+</button>
+                    <span class="side-value" id="val-slope-x">3,00°</span>
+                    <button class="adjust-btn" id="btn-slope-x-minus">-</button>
+                </div>
+
+                <!-- Bottom Part is handled by footer -->
+            </div>
+
+            <!-- Floating Global Controls (Hide in Putt?) -->
+            <div class="floating-controls" id="global-floating">
+                <button class="icon-btn" id="btnSettings">⚙️</button>
+                <button class="icon-btn" id="btnHistory">📜</button>
+            </div>
+        </main>
+
+        <!-- ZONE 3: FOOTER CONTROLS -->
+        <footer class="bottom-controls">
+            <div id="swing-footer" class="footer-segment">
+                <div class="swing-dashboard">
+                    <!-- Vertical Speed Control -->
+                    <div class="control-item speed-v">
+                        <span class="ctrl-label">SPEED</span>
+                        <div class="vertical-slider-track">
+                            <div id="speed-fill" class="speed-gauge-fill"></div>
+                            <input type="range" id="input-power" min="10" max="150" value="90" class="v-slider-input">
+                        </div>
+                        <span id="speed-label" class="ctrl-value">90 MPH</span>
+                    </div>
+
+                    <!-- Impact Visualization (Premium Feel) -->
+                    <div class="impact-viz">
+                        <canvas id="impactBallCanvas" width="80" height="80"></canvas>
+                    </div>
+
+                    <!-- Horizontal Controls Area -->
+                    <div class="h-controls-area">
+                        <div class="h-control-row">
+                            <div class="control-item h-item">
+                                <span class="ctrl-label">PATH ANGLE</span>
+                                <input type="range" id="input-path" min="-20" max="20" value="0" step="0.5"
+                                    class="h-slider-input">
+                                <span id="path-label" class="ctrl-value">0°</span>
+                            </div>
+                            <div class="control-item h-item">
+                                <span class="ctrl-label">FACE ANGLE</span>
+                                <input type="range" id="input-face" min="-15" max="15" value="0" step="0.5"
+                                    class="h-slider-input">
+                                <span id="face-angle-label" class="ctrl-value">0°</span>
+                            </div>
+                        </div>
+                        <div class="h-control-row">
+                            <div class="control-item h-item">
+                                <span class="ctrl-label">ATTACK ANGLE</span>
+                                <input type="range" id="input-attack" min="-10" max="10" value="0" step="0.5"
+                                    class="h-slider-input">
+                                <span id="attack-label" class="ctrl-value">0°</span>
+                            </div>
+                            <button class="action-btn-punchy" id="btnSwing">SWING</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="club-belt-container">
+                    <div class="club-belt" id="club-belt"></div>
+                </div>
+            </div>
+            <div id="putt-footer" class="footer-segment" style="display: none;">
+                <div class="putt-footer-container">
+                    <div class="target-control">
+                        <span class="target-label">TARGET</span>
+                        <div class="distance-adjust-group">
+                            <button class="adjust-btn-small" id="btn-dist-minus">-</button>
+                            <span class="target-value" id="label-putt-dist">5,00m</span>
+                            <button class="adjust-btn-small" id="btn-dist-plus">+</button>
+                        </div>
+                    </div>
+                    <div class="putt-actions-bottom">
+                        <button class="footer-btn reset-btn" id="btnResetPutt">↺ RESET</button>
+                        <button class="footer-btn action-btn-putt" id="btnPutt">▶ PUTT</button>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="settings-modal" style="display: none;">
+        <div class="modal-content">
+            <h3>SIMULATOR SETTINGS</h3>
+            <div class="setting-group">
+                <label>SPEED BOOST</label>
+                <input type="range" id="slider-speed-boost" min="0.5" max="2.0" step="0.1" value="1.0">
+                <span id="val-speed-boost">x1.0</span>
+            </div>
+            <div class="setting-group">
+                <label>ANGLE TOLERANCE</label>
+                <input type="range" id="slider-angle-limit" min="2" max="25" step="1" value="10">
+                <span id="val-angle-limit">10°</span>
+            </div>
+            <button class="close-btn" id="btnCloseSettings">CLOSE</button>
+        </div>
+    </div>
+
+    <script src="physics.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
