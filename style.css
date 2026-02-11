@@ -986,9 +986,15 @@ body {
         font-size: 16px;
     }
 
+    .gameplay-zone {
+        max-height: 45vh;
+        /* Further reduced for safer fitting */
+    }
+
     .bottom-controls {
         height: auto;
-        max-height: 45vh;
+        min-height: 15vh;
+        max-height: 40vh;
         /* Allow it to take more space but not cover everything */
         overflow-y: auto;
     }
