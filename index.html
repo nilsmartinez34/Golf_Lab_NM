@@ -176,21 +176,27 @@
                     <div class="h-controls-compact">
                         <div class="control-item h-item-compact">
                             <span class="ctrl-label-mini">PATH</span>
-                            <input type="range" id="input-path" min="-20" max="20" value="0" step="0.5"
-                                class="h-slider-input">
-                            <span id="path-label" class="ctrl-value-mini">0°</span>
+                            <div class="angle-adjust-group">
+                                <button class="angle-btn" id="btn-path-minus">−</button>
+                                <span id="path-label" class="angle-value">0°</span>
+                                <button class="angle-btn" id="btn-path-plus">+</button>
+                            </div>
                         </div>
                         <div class="control-item h-item-compact">
                             <span class="ctrl-label-mini">FACE</span>
-                            <input type="range" id="input-face" min="-15" max="15" value="0" step="0.5"
-                                class="h-slider-input">
-                            <span id="face-angle-label" class="ctrl-value-mini">0°</span>
+                            <div class="angle-adjust-group">
+                                <button class="angle-btn" id="btn-face-minus">−</button>
+                                <span id="face-angle-label" class="angle-value">0°</span>
+                                <button class="angle-btn" id="btn-face-plus">+</button>
+                            </div>
                         </div>
                         <div class="control-item h-item-compact">
                             <span class="ctrl-label-mini">ATTACK</span>
-                            <input type="range" id="input-attack" min="-10" max="10" value="0" step="0.5"
-                                class="h-slider-input">
-                            <span id="attack-label" class="ctrl-value-mini">0°</span>
+                            <div class="angle-adjust-group">
+                                <button class="angle-btn" id="btn-attack-minus">−</button>
+                                <span id="attack-label" class="angle-value">0°</span>
+                                <button class="angle-btn" id="btn-attack-plus">+</button>
+                            </div>
                         </div>
                         <button class="action-btn-punchy-compact" id="btnSwing">SWING</button>
                     </div>

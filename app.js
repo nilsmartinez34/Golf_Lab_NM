@@ -181,30 +181,44 @@ function initUI() {
             }
         };
     }
-    if (pathInput) {
-        pathInput.oninput = (e) => {
-            appState.path = parseFloat(e.target.value);
-            document.getElementById('path-label').textContent = `${appState.path > 0 ? '+' : ''}${appState.path.toFixed(1)}°`;
-        };
-    }
-    if (faceInput) {
-        faceInput.oninput = (e) => {
-            appState.face = parseFloat(e.target.value);
-            document.getElementById('face-angle-label').textContent = `${appState.face > 0 ? '+' : ''}${appState.face.toFixed(1)}°`;
-            // Sync with impact canvas: (face / limit) + 0.5 = strikeX
-            appState.strikePosition.x = (appState.face / appState.angleLimit) + 0.5;
-            if (window.drawImpact) window.drawImpact();
-        };
-    }
-    if (attackInput) {
-        attackInput.oninput = (e) => {
-            appState.attack = parseFloat(e.target.value);
-            document.getElementById('attack-label').textContent = `${appState.attack > 0 ? '+' : ''}${appState.attack.toFixed(1)}°`;
-            // Sync with impact canvas: 0.5 - (attack / 10) = strikeY
-            appState.strikePosition.y = 0.5 - (appState.attack / 10);
-            if (window.drawImpact) window.drawImpact();
-        };
-    }
+
+    // Path Angle Buttons (0.5° increments)
+    document.getElementById('btn-path-plus').onclick = () => {
+        appState.path = Math.min(20, appState.path + 0.5);
+        document.getElementById('path-label').textContent = `${appState.path > 0 ? '+' : ''}${appState.path.toFixed(1)}°`;
+    };
+    document.getElementById('btn-path-minus').onclick = () => {
+        appState.path = Math.max(-20, appState.path - 0.5);
+        document.getElementById('path-label').textContent = `${appState.path > 0 ? '+' : ''}${appState.path.toFixed(1)}°`;
+    };
+
+    // Face Angle Buttons (0.5° increments)
+    document.getElementById('btn-face-plus').onclick = () => {
+        appState.face = Math.min(15, appState.face + 0.5);
+        document.getElementById('face-angle-label').textContent = `${appState.face > 0 ? '+' : ''}${appState.face.toFixed(1)}°`;
+        appState.strikePosition.x = (appState.face / appState.angleLimit) + 0.5;
+        if (window.drawImpact) window.drawImpact();
+    };
+    document.getElementById('btn-face-minus').onclick = () => {
+        appState.face = Math.max(-15, appState.face - 0.5);
+        document.getElementById('face-angle-label').textContent = `${appState.face > 0 ? '+' : ''}${appState.face.toFixed(1)}°`;
+        appState.strikePosition.x = (appState.face / appState.angleLimit) + 0.5;
+        if (window.drawImpact) window.drawImpact();
+    };
+
+    // Attack Angle Buttons (0.5° increments)
+    document.getElementById('btn-attack-plus').onclick = () => {
+        appState.attack = Math.min(10, appState.attack + 0.5);
+        document.getElementById('attack-label').textContent = `${appState.attack > 0 ? '+' : ''}${appState.attack.toFixed(1)}°`;
+        appState.strikePosition.y = 0.5 - (appState.attack / 10);
+        if (window.drawImpact) window.drawImpact();
+    };
+    document.getElementById('btn-attack-minus').onclick = () => {
+        appState.attack = Math.max(-10, appState.attack - 0.5);
+        document.getElementById('attack-label').textContent = `${appState.attack > 0 ? '+' : ''}${appState.attack.toFixed(1)}°`;
+        appState.strikePosition.y = 0.5 - (appState.attack / 10);
+        if (window.drawImpact) window.drawImpact();
+    };
 
     // Distance Buttons (0.5m increments)
     document.getElementById('btn-dist-plus').onclick = () => {
