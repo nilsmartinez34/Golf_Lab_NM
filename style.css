@@ -296,12 +296,12 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 }
 
 .bottom-left {
-    bottom: 20px;
+    top: 20px;
     left: 20px;
 }
 
 .bottom-right {
-    bottom: 20px;
+    top: 20px;
     right: 20px;
 }
 
