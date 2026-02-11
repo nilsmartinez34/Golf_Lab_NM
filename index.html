@@ -95,6 +95,11 @@
 
             <!-- SWING OVERLAYS -->
             <div id="swing-content">
+                <!-- CLUB SELECTION SIDEBAR (Vertical Left) -->
+                <div class="club-belt-sidebar">
+                    <div class="club-belt-vertical" id="club-belt"></div>
+                </div>
+
                 <div class="hud bottom-left" id="hud-swing-left">
                     <span class="hud-title">SPEED</span>
                     <div class="hud-item"><span class="hud-label">CLUB</span><span class="hud-value"
@@ -175,33 +180,35 @@
                         <div class="control-item h-item-compact">
                             <span class="ctrl-label-mini">PATH</span>
                             <div class="angle-adjust-group">
-                                <button class="angle-btn" id="btn-path-minus">−</button>
+                                <div class="angle-buttons-vertical">
+                                    <button class="angle-btn" id="btn-path-plus">+</button>
+                                    <button class="angle-btn" id="btn-path-minus">−</button>
+                                </div>
                                 <span id="path-label" class="angle-value">0°</span>
-                                <button class="angle-btn" id="btn-path-plus">+</button>
                             </div>
                         </div>
                         <div class="control-item h-item-compact">
                             <span class="ctrl-label-mini">FACE</span>
                             <div class="angle-adjust-group">
-                                <button class="angle-btn" id="btn-face-minus">−</button>
+                                <div class="angle-buttons-vertical">
+                                    <button class="angle-btn" id="btn-face-plus">+</button>
+                                    <button class="angle-btn" id="btn-face-minus">−</button>
+                                </div>
                                 <span id="face-angle-label" class="angle-value">0°</span>
-                                <button class="angle-btn" id="btn-face-plus">+</button>
                             </div>
                         </div>
                         <div class="control-item h-item-compact">
                             <span class="ctrl-label-mini">ATTACK</span>
                             <div class="angle-adjust-group">
-                                <button class="angle-btn" id="btn-attack-minus">−</button>
+                                <div class="angle-buttons-vertical">
+                                    <button class="angle-btn" id="btn-attack-plus">+</button>
+                                    <button class="angle-btn" id="btn-attack-minus">−</button>
+                                </div>
                                 <span id="attack-label" class="angle-value">0°</span>
-                                <button class="angle-btn" id="btn-attack-plus">+</button>
                             </div>
                         </div>
                         <button class="action-btn-punchy-compact" id="btnSwing">SWING</button>
                     </div>
-                </div>
-
-                <div class="club-belt-container">
-                    <div class="club-belt" id="club-belt"></div>
                 </div>
             </div>
             <div id="putt-footer" class="footer-segment" style="display: none;">
