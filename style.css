@@ -910,8 +910,18 @@ body {
     }
 
     /* Putting Mobile */
+    #putt-footer {
+        gap: 10px;
+        padding: 5px 10px;
+        overflow-y: auto;
+    }
+
     .putt-footer-container {
-        gap: 15px;
+        gap: 10px;
+    }
+
+    .target-control {
+        gap: 5px;
     }
 
     .target-value {
@@ -922,6 +932,10 @@ body {
         width: 36px;
         height: 36px;
         font-size: 18px;
+    }
+
+    .putt-actions-bottom {
+        gap: 10px;
     }
 
     .footer-btn {
