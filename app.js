@@ -17,7 +17,10 @@ const appState = {
     puttAim: 0,
     slopeX: 3.0,
     slopeY: 0.0,
-    isAnimating: false
+    isAnimating: false,
+
+    // NEW: History
+    history: []
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -144,9 +147,23 @@ function solvePerfectPutt() {
 
 function initUI() {
     // Settings Modal
-    const modal = document.getElementById('settings-modal');
-    document.getElementById('btnSettings').onclick = () => modal.style.display = 'flex';
-    document.getElementById('btnCloseSettings').onclick = () => modal.style.display = 'none';
+    const settingsModal = document.getElementById('settings-modal');
+    document.getElementById('btnSettings').onclick = () => settingsModal.style.display = 'flex';
+    document.getElementById('btnCloseSettings').onclick = () => settingsModal.style.display = 'none';
+
+    // History Modal
+    const historyModal = document.getElementById('history-modal');
+    document.getElementById('btnHistory').onclick = () => {
+        renderHistory();
+        historyModal.style.display = 'flex';
+    };
+    document.getElementById('btnCloseHistory').onclick = () => historyModal.style.display = 'none';
+
+    // Close on backdrop click
+    window.onclick = (event) => {
+        if (event.target == settingsModal) settingsModal.style.display = "none";
+        if (event.target == historyModal) historyModal.style.display = "none";
+    };
 
     // Swing Inputs
     const powerInput = document.getElementById('input-power');
@@ -465,6 +482,7 @@ function initMainCanvas() {
         appState.trajectoryResult = result;
         animate(result);
         updateSwingMetrics(result);
+        addHistoryItem('Swing', result);
     };
 
     window.calculatePutt = function () {
@@ -481,9 +499,11 @@ function initMainCanvas() {
             }
         });
 
-        appState.trajectoryResult = { ...res, isPutt: true, apexPoint };
-        animate({ ...res, isPutt: true, apexPoint });
+        const finalResult = { ...res, isPutt: true, apexPoint };
+        appState.trajectoryResult = finalResult;
+        animate(finalResult);
         updatePuttMetrics(res, apexPoint);
+        addHistoryItem('Putt', finalResult);
     };
 
     window.animate = function (result) {
@@ -557,20 +577,58 @@ function initMainCanvas() {
         document.getElementById('val-m3').textContent = Math.abs(res.lateralDeviation).toFixed(1);
         document.getElementById('unit-m3').textContent = res.lateralDeviation < 0 ? 'L' : 'R';
 
-        // New Advanced Metrics
-        document.getElementById('val-spin-back').textContent = Math.round(res.backspin);
-        document.getElementById('val-spin-side').textContent = Math.round(res.sidespin);
+        // Fix: Property names from physics.js (spinRpm/sideSpinRpm)
+        document.getElementById('val-spin-back').textContent = Math.round(res.spinRpm);
+        document.getElementById('val-spin-side').textContent = Math.round(res.sideSpinRpm);
         document.getElementById('val-smash').textContent = res.smashFactor.toFixed(2);
 
         document.getElementById('hud-club-speed').textContent = res.clubHeadSpeedMph.toFixed(1);
         document.getElementById('hud-ball-speed').textContent = res.ballSpeedMph.toFixed(1);
         document.querySelectorAll('.hud-value').forEach(el => {
-            if (el.id === 'hud-path') el.textContent = res.swingPath.toFixed(1) + '°';
-            // User requested to flip the face angle sign: curser right = positive face angle
-            if (el.id === 'hud-face') el.textContent = (-res.faceToPath).toFixed(1) + '°';
+            if (el.id === 'hud-path') el.textContent = `${res.swingPath > 0 ? '+' : ''}${res.swingPath.toFixed(1)}°`;
+            // User requested to flip the face angle sign
+            if (el.id === 'hud-face') el.textContent = `${(-res.faceToPath) > 0 ? '+' : ''}${(-res.faceToPath).toFixed(1)}°`;
         });
     }
-    坐
+
+    function addHistoryItem(type, result) {
+        const item = {
+            type,
+            club: appState.currentClub.name,
+            mainVal: type === 'Swing' ? piece(result.carryDistance, 'M') : piece(result.totalDistance, 'M'),
+            subVal: type === 'Swing' ? `${Math.round(result.spinRpm)} RPM` : `${result.finalX.toFixed(2)}m Error`,
+            date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        appState.history.unshift(item); // Newest first
+    }
+
+    function piece(val, unit) { return `${val.toFixed(1)} ${unit}`; }
+
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        list.innerHTML = '';
+        if (appState.history.length === 0) {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:rgba(255,255,255,0.2)">Aucune donnée</div>';
+            return;
+        }
+
+        appState.history.forEach(h => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerHTML = `
+                <div class="his-left">
+                    <span class="his-club">${h.type === 'Swing' ? h.club : 'PUTTER'}</span>
+                    <span class="his-date">${h.date}</span>
+                </div>
+                <div class="his-metrics">
+                    <div class="his-main">${h.mainVal}</div>
+                    <div class="his-sub">${h.subVal}</div>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
     function updatePuttMetrics(res, apex) {
         const aimVal = Math.abs(appState.puttAim);
         const aimUnit = appState.puttAim < 0 ? "m LEFT" : appState.puttAim > 0 ? "m RIGHT" : "m";

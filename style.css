@@ -59,49 +59,77 @@ body {
 
 /* ZONE 1: TOP METRICS */
 .top-metrics {
-    height: 80px;
+    height: 85px;
     background-color: var(--bg-header);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
-    justify-content: space-around;
     align-items: center;
-    padding: 0;
+    padding: 0 20px;
+    z-index: 10;
 }
 
 .metric-container {
-    width: 100%;
-    height: 100%;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
+    width: 100%;
+}
+
+.metric-group {
+    display: flex;
+    gap: 30px;
 }
 
 .metric-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.metric-item.full-width {
+    flex: 1;
     text-align: center;
 }
 
-.metric-item .label {
-    display: block;
+.label {
     font-size: 10px;
     font-weight: 700;
     color: var(--text-secondary);
-    letter-spacing: 0.5px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
 }
 
-.metric-item .value-group {
+.value-group {
     display: flex;
     align-items: baseline;
-    justify-content: center;
+    gap: 4px;
 }
 
-.metric-item .value-group span:first-child {
-    font-size: 20px;
+.value-group span:first-child {
+    font-size: 24px;
     font-weight: 900;
+    color: #FFF;
+    line-height: 1;
 }
 
-.metric-item .unit {
+.unit {
     font-size: 10px;
+    font-weight: 700;
     color: var(--text-secondary);
-    margin-left: 2px;
+}
+
+/* Specific Highlight for Spin */
+.mid-metrics .value-group span:first-child {
+    color: #FACC15;
+    /* Yellow/Gold for technical metrics */
+    text-shadow: 0 0 10px rgba(250, 204, 21, 0.3);
+}
+
+/* PUTT HEADER ADJUSTMENTS */
+.metric-grid-top {
+    display: flex;
+    gap: 40px;
+    flex: 1;
 }
 
 /* PUTT METRICS SPECIFIC */
@@ -153,56 +181,136 @@ body {
     display: block;
 }
 
-/* HUDs */
+/* HUD OVERLAYS (Floating Info Boxes) */
 .hud {
     position: absolute;
-    background: var(--glass);
-    backdrop-filter: blur(8px);
-    padding: 10px 15px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    min-width: 120px;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 15px 20px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    z-index: 5;
+    min-width: 140px;
 }
 
 .bottom-left {
-    bottom: 80px;
-    left: 12px;
+    bottom: 20px;
+    left: 20px;
 }
 
 .bottom-right {
-    bottom: 80px;
-    right: 12px;
+    bottom: 20px;
+    right: 20px;
 }
 
 .hud-title {
     display: block;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 900;
-    color: rgba(255, 255, 255, 0.4);
-    margin-bottom: 4px;
+    color: var(--text-secondary);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 5px;
 }
 
 .hud-item {
     display: flex;
+    justify-content: space-between;
     align-items: baseline;
-    margin-top: 2px;
+    gap: 15px;
+    margin-bottom: 6px;
 }
 
 .hud-label {
-    font-size: 9px;
-    color: var(--text-secondary);
-    width: 40px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.4);
 }
 
 .hud-value {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
+    color: #FFF;
 }
 
 .hud-unit {
-    font-size: 8px;
+    font-size: 10px;
+    margin-left: 4px;
     color: var(--text-secondary);
-    margin-left: 2px;
+}
+
+/* HISTORY MODAL SPECIFIC */
+.history-content {
+    max-width: 450px;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    margin: 15px 0;
+    padding-right: 5px;
+}
+
+.history-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.his-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.his-club {
+    font-weight: 900;
+    color: var(--accent);
+    font-size: 14px;
+}
+
+.his-date {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.his-metrics {
+    text-align: right;
+}
+
+.his-main {
+    font-size: 16px;
+    font-weight: 700;
+    color: #FFF;
+}
+
+.his-sub {
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.history-scroll-area::-webkit-scrollbar {
+    width: 4px;
+}
+
+.history-scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.history-scroll-area::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
 }
 
 /* Action Buttons */
@@ -369,51 +477,91 @@ body {
     right: 15px;
 }
 
-/* SIDE CONTROLS */
+/* FLOATING ACTION BUTTONS */
+.floating-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 12px;
+    z-index: 20;
+}
+
+.icon-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background: rgba(15, 23, 42, 0.8);
+    transform: translateY(-2px);
+    border-color: var(--accent);
+}
+
+/* SIDE CONTROLS (PUTTING) */
 .side-control {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 15px 12px;
+    border-radius: 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 15px 5px;
-    border-radius: 12px;
-    width: 60px;
-    pointer-events: auto;
+    gap: 12px;
+    z-index: 5;
 }
 
 .side-control.left {
-    left: 10px;
+    left: 15px;
 }
 
 .side-control.right {
-    right: 10px;
+    right: 15px;
 }
 
 .side-label {
-    font-size: 8px;
-    font-weight: 700;
-    white-space: nowrap;
+    font-size: 9px;
+    font-weight: 900;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
 }
 
 .adjust-btn {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     background: rgba(255, 255, 255, 0.05);
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    color: white;
+    color: #FFF;
     font-size: 20px;
-    font-weight: 700;
     cursor: pointer;
+    transition: all 0.2s;
+}
+
+.adjust-btn:active {
+    background: var(--accent);
+    color: #000;
 }
 
 .side-value {
-    font-size: 16px;
-    font-weight: 900;
+    font-size: 14px;
+    font-weight: 700;
     color: var(--accent);
 }
 
