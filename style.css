@@ -830,9 +830,102 @@ body {
     cursor: pointer;
 }
 
-/* Responsive adjustment */
+/* Responsive adjustment for mobile */
 @media (max-width: 600px) {
+    .top-metrics {
+        height: 60px;
+        padding: 5px;
+    }
+
+    .metric-group {
+        gap: 15px;
+    }
+
+    .metric-item .value-group span:first-child {
+        font-size: 16px;
+    }
+
     .bottom-controls {
-        height: 160px;
+        height: auto;
+        max-height: 45vh;
+        /* Allow it to take more space but not cover everything */
+        overflow-y: auto;
+    }
+
+    #swing-footer,
+    #putt-footer {
+        padding: 10px;
+        gap: 15px;
+    }
+
+    .swing-dashboard {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-bottom: 5px;
+    }
+
+    .speed-v {
+        width: 60px;
+    }
+
+    .vertical-slider-track {
+        height: 100px;
+    }
+
+    .impact-viz {
+        width: 70px;
+        height: 100px;
+    }
+
+    #impactBallCanvas {
+        width: 60px;
+        height: 60px;
+    }
+
+    .h-controls-area {
+        gap: 8px;
+    }
+
+    .h-item {
+        min-width: 140px;
+        /* Force rows to wrap better on very narrow screens */
+    }
+
+    .action-btn-punchy {
+        padding: 10px 20px;
+        font-size: 14px;
+        width: 100%;
+        /* Full width on mobile for better thumb access */
+    }
+
+    .club-belt-container {
+        height: 50px;
+    }
+
+    .club-item {
+        min-width: 45px;
+        height: 35px;
+        font-size: 12px;
+    }
+
+    /* Putting Mobile */
+    .putt-footer-container {
+        gap: 15px;
+    }
+
+    .target-value {
+        font-size: 22px;
+    }
+
+    .adjust-btn-small {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+    .footer-btn {
+        height: 45px;
+        font-size: 14px;
     }
 }
