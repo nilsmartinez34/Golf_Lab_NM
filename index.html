@@ -153,6 +153,17 @@
                 <button class="icon-btn" id="btnSettings">⚙️</button>
                 <button class="icon-btn" id="btnHistory">📜</button>
             </div>
+
+            <!-- Weather HUD (Bottom Right) -->
+            <div class="weather-hud" id="weather-hud">
+                <div class="wind-indicator">
+                    <div class="wind-arrow" id="wind-arrow">↑</div>
+                    <span id="wind-speed-hud">0 km/h</span>
+                </div>
+                <div class="air-extra">
+                    <span id="alt-temp-hud">0m · 20°C</span>
+                </div>
+            </div>
         </main>
 
         <!-- ZONE 3: FOOTER CONTROLS -->
@@ -243,6 +254,31 @@
                 <input type="range" id="slider-angle-limit" min="2" max="25" step="1" value="10">
                 <span id="val-angle-limit">10°</span>
             </div>
+
+            <h4 style="margin: 1.25rem 0 0.625rem 0; color: var(--accent); font-size: 0.75rem; letter-spacing: 1px;">
+                WEATHER & ATMOSPHERE</h4>
+
+            <div class="setting-group">
+                <label>ALTITUDE (m)</label>
+                <input type="range" id="slider-altitude" min="0" max="5000" step="50" value="0">
+                <span id="val-altitude">0m</span>
+            </div>
+            <div class="setting-group">
+                <label>TEMP (°C)</label>
+                <input type="range" id="slider-temp" min="-10" max="50" step="1" value="20">
+                <span id="val-temp">20°C</span>
+            </div>
+            <div class="setting-group">
+                <label>WIND SPEED (km/h)</label>
+                <input type="range" id="slider-wind-speed" min="0" max="100" step="1" value="0">
+                <span id="val-wind-speed">0 km/h</span>
+            </div>
+            <div class="setting-group">
+                <label>WIND DIR (°)</label>
+                <input type="range" id="slider-wind-dir" min="0" max="359" step="1" value="0">
+                <span id="val-wind-dir">0° (Tail)</span>
+            </div>
+
             <button class="close-btn" id="btnCloseSettings">CLOSE</button>
         </div>
     </div>
@@ -257,7 +293,7 @@
         </div>
     </div>
 
-    <script src="physics.js"></script>
+    <script src="physics_ultimate.js"></script>
     <script src="app.js"></script>
 
     <!-- Service Worker Registration -->

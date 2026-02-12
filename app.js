@@ -20,10 +20,23 @@ const appState = {
     isAnimating: false,
 
     // NEW: History
-    history: JSON.parse(localStorage.getItem('golf_history')) || []
+    history: JSON.parse(localStorage.getItem('golf_history')) || [],
+
+    // NEW: Weather
+    weather: {
+        altitude: 0,
+        temp: 20,
+        windSpeed: 0,
+        windDir: 0
+    }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Inject name property from keys for UI consistency
+    Object.keys(PhysicsEngine.GOLF_BAG).forEach(key => {
+        PhysicsEngine.GOLF_BAG[key].name = key;
+    });
+
     initTabs();
     initUI();
     initClubBelt();
@@ -31,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initMainCanvas();
     updateModeUI();
     updatePuttUI(); // Initial putt UI sync
+    updateWeatherHUD(); // Initial weather HUD sync
 });
 
 function initTabs() {
@@ -149,6 +163,7 @@ function initUI() {
     // Settings Modal
     const settingsModal = document.getElementById('settings-modal');
     document.getElementById('btnSettings').onclick = () => settingsModal.style.display = 'flex';
+    document.getElementById('weather-hud').onclick = () => settingsModal.style.display = 'flex';
     document.getElementById('btnCloseSettings').onclick = () => settingsModal.style.display = 'none';
 
     // History Modal
@@ -272,6 +287,60 @@ function initUI() {
             document.getElementById('val-angle-limit').textContent = `${appState.angleLimit}°`;
         };
     }
+
+    // Weather Inputs
+    const altSlider = document.getElementById('slider-altitude');
+    const tempSlider = document.getElementById('slider-temp');
+    const windSSlider = document.getElementById('slider-wind-speed');
+    const windDSlider = document.getElementById('slider-wind-dir');
+
+    if (altSlider) altSlider.oninput = (e) => {
+        appState.weather.altitude = parseInt(e.target.value);
+        document.getElementById('val-altitude').textContent = `${appState.weather.altitude}m`;
+        updateWeatherHUD();
+    };
+    if (tempSlider) tempSlider.oninput = (e) => {
+        appState.weather.temp = parseInt(e.target.value);
+        document.getElementById('val-temp').textContent = `${appState.weather.temp}°C`;
+        updateWeatherHUD();
+    };
+    if (windSSlider) windSSlider.oninput = (e) => {
+        appState.weather.windSpeed = parseInt(e.target.value);
+        document.getElementById('val-wind-speed').textContent = `${appState.weather.windSpeed} km/h`;
+        updateWeatherHUD();
+    };
+    if (windDSlider) windDSlider.oninput = (e) => {
+        appState.weather.windDir = parseInt(e.target.value);
+        let dirLabel = "";
+        const d = appState.weather.windDir;
+        if (d >= 315 || d < 45) dirLabel = "Tail";
+        else if (d >= 45 && d < 135) dirLabel = "Cross-L";
+        else if (d >= 135 && d < 225) dirLabel = "Head";
+        else dirLabel = "Cross-R";
+        document.getElementById('val-wind-dir').textContent = `${d}° (${dirLabel})`;
+        updateWeatherHUD();
+    };
+}
+
+function updateWeatherHUD() {
+    const w = appState.weather;
+
+    // Wind Arrow & Speed
+    const arrow = document.getElementById('wind-arrow');
+    const speed = document.getElementById('wind-speed-hud');
+    if (arrow) {
+        // WindDir: 0 is Tailwind (Up), 180 is Headwind (Down)
+        arrow.style.transform = `rotate(${w.windDir}deg)`;
+    }
+    if (speed) {
+        speed.textContent = w.windSpeed > 0 ? `${w.windSpeed} km/h` : "NUL";
+    }
+
+    // Alt & Temp
+    const extra = document.getElementById('alt-temp-hud');
+    if (extra) {
+        extra.textContent = `${w.altitude}m · ${w.temp}°C`;
+    }
 }
 
 function initClubBelt() {
@@ -366,15 +435,28 @@ function initMainCanvas() {
     }
 
     function drawSwingGrid() {
-        ctx.fillStyle = '#0F172A';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
         const horizonY = canvas.height * 0.38;
+
+        // 1. SKY GRADIENT (Top to Horizon)
+        const skyGradient = ctx.createLinearGradient(0, 0, 0, horizonY);
+        skyGradient.addColorStop(0, '#1E40AF'); // Deep Blue
+        skyGradient.addColorStop(1, '#60A5FA'); // Light Blue near horizon
+        ctx.fillStyle = skyGradient;
+        ctx.fillRect(0, 0, canvas.width, horizonY);
+
+        // 2. GROUND GRADIENT (Horizon to Bottom)
+        const groundGradient = ctx.createLinearGradient(0, horizonY, 0, canvas.height);
+        groundGradient.addColorStop(0, '#064E3B'); // Forest Green at horizon
+        groundGradient.addColorStop(1, '#10B981'); // Vibrant Green at foreground
+        ctx.fillStyle = groundGradient;
+        ctx.fillRect(0, horizonY, canvas.width, canvas.height - horizonY);
+
         const groundStartY = canvas.height * 0.88;
         const groundRange = groundStartY - horizonY;
         const k = 0.0052;
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        // Grid lines (White with subtle transparency)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
         ctx.lineWidth = 1;
         const lateralLines = 10;
         for (let i = -lateralLines; i <= lateralLines; i++) {
@@ -388,6 +470,7 @@ function initMainCanvas() {
             ctx.stroke();
         }
 
+        // Horizontal distance markers
         for (let d = 0; d <= 300; d += 50) {
             const scale = Math.exp(-k * d);
             const y = horizonY + (groundRange * scale);
@@ -395,7 +478,10 @@ function initMainCanvas() {
             ctx.moveTo(0, y);
             ctx.lineTo(canvas.width, y);
             ctx.stroke();
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+
+            // Visible markers markers in White
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 12px Inter, sans-serif';
             ctx.fillText(`${d}m`, 10, y - 5);
         }
     }
@@ -451,16 +537,35 @@ function initMainCanvas() {
         ctx.strokeStyle = '#4ADE80'; ctx.lineWidth = 1; ctx.stroke();
     }
 
+    // Dans app.js
+
     function drawPersistentSwingTrajectory(result) {
         if (!result.path || result.isPutt) return;
-        const hY = canvas.height * 0.38, gY = canvas.height * 0.88, gR = gY - hY, k = 0.0052;
+
+        const hY = canvas.height * 0.38; // Horizon
+        const gY = canvas.height * 0.88; // Départ sol
+        const gR = gY - hY;              // Ecart sol-horizon
+        const k = 0.0052;                // Facteur perspective
+
+        // Facteur de zoom visuel pour que la balle ne paraisse pas minuscule
+        const VIEW_SCALE = 20.0;
+
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)'; // Un peu plus visible
+        ctx.lineWidth = 2; // Un peu plus épais
+
         result.path.forEach((p, i) => {
+            // Facteur d'échelle selon la distance (profondeur X)
             const sc = Math.exp(-k * p.x);
-            const sx = (canvas.width * 0.5) + (p.z * sc * 15);
-            const sy = (hY + (gR * sc)) - (p.y * sc * 19.0);
+
+            // --- CORRECTION ICI ---
+            // SX (Ecran X) = Centre + (Deviation Latérale Y * Echelle * Zoom)
+            const sx = (canvas.width * 0.5) + (p.y * sc * VIEW_SCALE);
+
+            // SY (Ecran Y) = LigneSolPerspective - (Hauteur Z * Echelle * Zoom)
+            const sy = (hY + (gR * sc)) - (p.z * sc * VIEW_SCALE);
+            // ---------------------
+
             if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
         });
         ctx.stroke();
@@ -489,13 +594,15 @@ function initMainCanvas() {
     window.calculateSwing = function () {
         const input = {
             clubSpeedMph: appState.power * appState.speedFactor,
-            powerFactor: 1.0, efficiency: 1.0,
+            powerFactor: 1.0,
+            efficiency: appState.currentClub.efficiency,
             pathDeviationDeg: appState.path,
             clubFaceAngle: appState.face
         };
         const manualAttackAngle = appState.attack;
         const params = PhysicsEngine.calculateLaunchParams(input, appState.currentClub, manualAttackAngle);
-        const result = PhysicsEngine.simulateTrajectory(params, input, appState.currentClub);
+        // Correct signature: simulateTrajectory(launchParams, environment)
+        const result = PhysicsEngine.simulateTrajectory(params, appState.weather);
         appState.trajectoryResult = result;
         animate(result);
         updateSwingMetrics(result);
@@ -567,19 +674,38 @@ function initMainCanvas() {
                     }
                 }
 
-            } else {
-                const hY = canvas.height * 0.38, gY = canvas.height * 0.88, gR = gY - hY, k = 0.0052;
+            }
+            else {
+                const hY = canvas.height * 0.38;
+                const gY = canvas.height * 0.88;
+                const gR = gY - hY;
+                const k = 0.0052;
+                const VIEW_SCALE = 20.0; // Même constante que pour la trace persistante
+
+                // Dessiner la trace
+                ctx.beginPath();
                 for (let i = 0; i <= frame; i++) {
-                    const p = result.path[i], sc = Math.exp(-k * p.x);
-                    const sx = (canvas.width * 0.5) + (p.z * sc * 15);
-                    const sy = (hY + (gR * sc)) - (p.y * sc * 19.0);
+                    const p = result.path[i];
+                    const sc = Math.exp(-k * p.x);
+
+                    // CORRECTION: p.y pour latéral, p.z pour hauteur
+                    const sx = (canvas.width * 0.5) + (p.y * sc * VIEW_SCALE);
+                    const sy = (hY + (gR * sc)) - (p.z * sc * VIEW_SCALE);
+
                     if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
                 }
                 ctx.stroke();
-                const p = result.path[frame], sc = Math.exp(-k * p.x);
-                const sx = (canvas.width * 0.5) + (p.z * sc * 15);
-                const sy = (hY + (gR * sc)) - (p.y * sc * 19.0);
+
+                // Dessiner la balle
+                const p = result.path[frame];
+                const sc = Math.exp(-k * p.x);
+
+                // CORRECTION: Idem
+                const sx = (canvas.width * 0.5) + (p.y * sc * VIEW_SCALE);
+                const sy = (hY + (gR * sc)) - (p.z * sc * VIEW_SCALE);
+
                 ctx.fillStyle = 'white';
+                // La balle rétrécit avec la distance
                 ctx.beginPath(); ctx.arc(sx, sy, Math.max(2, 6 * sc), 0, Math.PI * 2); ctx.fill();
             }
             frame += 2;
@@ -603,8 +729,8 @@ function initMainCanvas() {
         document.getElementById('hud-ball-speed').textContent = res.ballSpeedMph.toFixed(1);
         document.querySelectorAll('.hud-value').forEach(el => {
             if (el.id === 'hud-path') el.textContent = `${res.swingPath > 0 ? '+' : ''}${res.swingPath.toFixed(1)}°`;
-            // User requested to flip the face angle sign
-            if (el.id === 'hud-face') el.textContent = `${(-res.faceToPath) > 0 ? '+' : ''}${(-res.faceToPath).toFixed(1)}°`;
+            // Correction affichage (plus de signe moins)
+            if (el.id === 'hud-face') el.textContent = `${res.faceToPath > 0 ? '+' : ''}${res.faceToPath.toFixed(1)}°`;
         });
     }
 

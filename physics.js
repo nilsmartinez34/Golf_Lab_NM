@@ -20,6 +20,23 @@ const PhysicsEngine = {
         "LW": { name: "LW", loft: 58.0, length: 35.0, smashFactor: 1.00, baseSpinRpm: 13500.0, rollFactor: 0.01 }
     },
 
+    // NEW: Helper to calculate air density based on altitude and temperature
+    calculateAirDensity: (altitude, tempCelsius) => {
+        const P0 = 101325; // Sea level pressure (Pa)
+        const T0 = 288.15; // Sea level standard temperature (K)
+        const g = 9.80665;
+        const L = 0.0065;  // Temperature lapse rate (K/m)
+        const R = 8.31447; // Universal gas constant
+        const M = 0.0289644; // Molar mass of dry air (kg/mol)
+
+        const T = (tempCelsius + 273.15); // Local temperature (K)
+        // Barometric formula for pressure at altitude
+        const P = P0 * Math.pow(1 - (L * altitude) / T0, (g * M) / (R * L));
+        // Ideal gas law for density
+        const rho = (P * M) / (R * T);
+        return rho;
+    },
+
     calculateLaunchParams: (input, club, manualAttackAngle = 0) => {
         const vClubMps = (input.clubSpeedMph * input.powerFactor) * 0.44704;
         const vBallMps = vClubMps * club.smashFactor * input.efficiency;
@@ -42,68 +59,137 @@ const PhysicsEngine = {
         };
     },
 
-    simulateTrajectory: (params, input, club) => {
+
+    simulateTrajectory: (params, input, club, weather = { altitude: 0, temp: 20, windSpeed: 0, windDir: 0 }) => {
         const path = [];
-        const dt = 0.01;
+        const dt = 0.01; // Pas de temps en secondes
         let t = 0.0;
-        let x = 0.0, y = 0.0, z = 0.0;
+        let x = 0.0, y = 0.0, z = 0.0; // Position initiale
 
         const launchRad = params.launchAngleDeg * Math.PI / 180;
         const yawRad = params.horizontalLaunchDeg * Math.PI / 180;
 
+        // Vecteurs vitesse initiaux
         let vx = params.ballSpeedMps * Math.cos(launchRad) * Math.cos(yawRad);
         let vy = params.ballSpeedMps * Math.sin(launchRad);
         let vz = params.ballSpeedMps * Math.cos(launchRad) * Math.sin(yawRad);
+
+        // Paramètres Vent
+        const windMpsBase = (weather.windSpeed / 3.6);
+        const windRad = (weather.windDir * Math.PI / 180);
+        const vWindXBase = windMpsBase * Math.cos(windRad);
+        const vWindZBase = windMpsBase * Math.sin(windRad);
+
+        // Densité de l'air locale
+        const rho = PhysicsEngine.calculateAirDensity(weather.altitude, weather.temp);
 
         let currentBackSpin = params.backSpinRpm;
         let currentSideSpin = params.sideSpinRpm;
         let maxY = 0.0;
 
+        // Fonction pour calculer les forces (pour la méthode de Runge-Kutta)
+        const calculateAccelerations = (currVx, currVy, currVz, currY, currBackSpin, currSideSpin) => {
+
+            // 1. Wind Shear Profile (le vent augmente avec l'altitude Y)
+            // Utilisation d'une loi de puissance simple pour le profil de vent
+            const windSpeedAtY = windMpsBase * Math.pow(Math.max(currY, 0.5) / 10, 0.15);
+            const vWindX = windSpeedAtY * Math.cos(windRad);
+            const vWindZ = windSpeedAtY * Math.sin(windRad);
+
+            // 2. Vitesse relative
+            const vRelX = currVx - vWindX;
+            const vRelY = currVy;
+            const vRelZ = currVz - vWindZ;
+            const vRel = Math.sqrt(vRelX * vRelX + vRelY * vRelY + vRelZ * vRelZ);
+
+            if (vRel < 0.1) return { ax: 0, ay: -PhysicsEngine.GRAVITY, az: 0 };
+
+            // 3. Coefficients Aérodynamiques (Cd, Cl)
+            const omega = Math.sqrt(currBackSpin * currBackSpin + currSideSpin * currSideSpin) * (2 * Math.PI / 60);
+            const spinParameter = (PhysicsEngine.RADIUS * omega) / Math.max(vRel, 1.0);
+
+            // Cd dépend de la vitesse (Reynolds number) et du spin
+            // Amélioration: Légère modification des constantes pour mieux coller aux balles modernes
+            const cd_base = 0.18 + 0.22 / (1.0 + Math.exp(0.3 * (vRel - 35.0)));
+            const cd_spin = 0.35 * Math.pow(spinParameter, 1.8);
+            const cd = cd_base + cd_spin;
+
+            // Cl (Lift coefficient) - AMÉLIORATION RÉALISME
+            // Réduction de la constante de base (0.06) et augmentation de la dépendance au spin
+            // pour que la portance chute drastiquement quand vRel diminue (vent dans le dos)
+
+            const cl = 0.08 + 0.40 * (1.0 - Math.exp(-2.0 * spinParameter));
+
+            // 4. Forces
+            const dragForce = 0.5 * rho * vRel * vRel * PhysicsEngine.AREA * cd;
+            const liftForce = 0.5 * rho * vRel * vRel * PhysicsEngine.AREA * cl;
+
+            // Directions
+            const dragDirX = -vRelX / vRel;
+            const dragDirY = -vRelY / vRel;
+            const dragDirZ = -vRelZ / vRel;
+
+            // Lift direction est complexe (perpendiculaire à vRel et à l'axe de spin)
+            // Approximation par composantes
+            const totalSpin = Math.sqrt(currBackSpin * currBackSpin + currSideSpin * currSideSpin) || 1.0;
+            const liftDirBackX = -vRelY / Math.sqrt(vRelX * vRelX + vRelY * vRelY);
+            const liftDirBackY = vRelX / Math.sqrt(vRelX * vRelX + vRelY * vRelY);
+
+            // Calcul final accélérations
+            const ax = (dragForce * dragDirX) / PhysicsEngine.MASS;
+            const ay = (dragForce * dragDirY) / PhysicsEngine.MASS - PhysicsEngine.GRAVITY;
+            const az = (dragForce * dragDirZ) / PhysicsEngine.MASS;
+
+            // Ajout du Lift (Magnus effect)
+            if (totalSpin > 0) {
+                // Simplification: le lift agit principalement vers le haut pour le backspin
+                // et latéralement pour le sidespin
+                // liftDirBack: Perpendiculaire à vRel dans le plan vertical de tir
+                // liftDirSide: Perpendiculaire à vRel dans le plan horizontal de tir
+                return {
+                    ax: ax + (liftForce * (currBackSpin / totalSpin) * liftDirBackX) / PhysicsEngine.MASS,
+                    ay: ay + (liftForce * (currBackSpin / totalSpin) * liftDirBackY) / PhysicsEngine.MASS,
+                    az: az + (liftForce * (currSideSpin / totalSpin) * dragDirX) / PhysicsEngine.MASS // Approximation sidespin
+                };
+            }
+
+            return { ax, ay, az };
+        };
+
+        // --- Boucle de Simulation (Runge-Kutta 2nd Order) ---
         while (y >= 0.0 && t < 15.0) {
             path.push({ x, y, z });
             if (y > maxY) maxY = y;
 
-            const v = Math.sqrt(vx * vx + vy * vy + vz * vz);
-            if (v < 0.5) break;
+            // Étape 1 : Calcul des accélérations au début du pas (Euler)
+            let acc1 = calculateAccelerations(vx, vy, vz, y, currentBackSpin, currentSideSpin);
 
-            const omegaRad = (Math.sqrt(currentBackSpin ** 2 + currentSideSpin ** 2) * 2 * Math.PI) / 60.0;
-            const spinParameter = (PhysicsEngine.RADIUS * omegaRad) / v;
+            // Étape 2 : Position et vitesse intermédiaires (Midpoint)
+            let midVx = vx + acc1.ax * dt / 2;
+            let midVy = vy + acc1.ay * dt / 2;
+            let midVz = vz + acc1.az * dt / 2;
+            let midY = y + vy * dt / 2;
 
-            const cd_base = 0.20 + 0.25 / (1.0 + Math.exp(0.3 * (v - 35.0)));
-            const cd_spin = 0.35 * Math.pow(spinParameter, 1.8);
-            const cd = cd_base + cd_spin;
+            // Étape 3 : Accélérations au point intermédiaire
+            let acc2 = calculateAccelerations(midVx, midVy, midVz, midY, currentBackSpin, currentSideSpin);
 
-            const cl = 0.10 + 0.30 * (1.0 - Math.exp(-3.0 * spinParameter));
+            // Étape 4 : Mise à jour finale position et vitesse
+            x += midVx * dt;
+            y += midVy * dt;
+            z += midVz * dt;
 
-            const dragForce = 0.5 * PhysicsEngine.RHO * v * v * PhysicsEngine.AREA * cd;
-            const liftForce = 0.5 * PhysicsEngine.RHO * v * v * PhysicsEngine.AREA * cl;
+            vx += acc2.ax * dt;
+            vy += acc2.ay * dt;
+            vz += acc2.az * dt;
 
-            const ax_drag = -(vx / v) * (dragForce / PhysicsEngine.MASS);
-            const ay_drag = -(vy / v) * (dragForce / PhysicsEngine.MASS);
-            const az_drag = -(vz / v) * (dragForce / PhysicsEngine.MASS);
-
-            const totalSpin = Math.sqrt(currentBackSpin ** 2 + currentSideSpin ** 2) || 1.0;
-            const liftRatioBack = currentBackSpin / totalSpin;
-            const liftRatioSide = currentSideSpin / totalSpin;
-
-            const ay_lift = (vx / v) * (liftForce / PhysicsEngine.MASS) * liftRatioBack;
-            const az_lift = (vx / v) * (liftForce / PhysicsEngine.MASS) * liftRatioSide;
-
-            vx += ax_drag * dt;
-            vy += (ay_drag + ay_lift - PhysicsEngine.GRAVITY) * dt;
-            vz += (az_drag + az_lift) * dt;
-
-            x += vx * dt;
-            y += vy * dt;
-            z += vz * dt;
-
+            // Décroissance du spin (plus rapide si la traînée est forte)
             currentBackSpin *= PhysicsEngine.SPIN_DECAY;
             currentSideSpin *= PhysicsEngine.SPIN_DECAY;
             t += dt;
         }
 
+        // ... (calcul du roll et retour identique)
         if (y < 0) path.push({ x, y: 0.0, z });
-
         const roll = x * club.rollFactor * Math.max(0.0, Math.min(0.8, 1.0 - (maxY / 50.0)));
 
         return {
@@ -183,3 +269,7 @@ const PhysicsEngine = {
         };
     }
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = PhysicsEngine;
+}
