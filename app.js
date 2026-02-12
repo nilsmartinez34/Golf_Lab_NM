@@ -78,9 +78,6 @@ function updateModeUI() {
     document.getElementById('swing-metrics-header').style.display = isSwing ? 'flex' : 'none';
     document.getElementById('putt-metrics-header').style.display = isSwing ? 'none' : 'flex';
 
-    // Floating global controls visibility
-    document.getElementById('global-floating').style.display = isSwing ? 'flex' : 'none';
-
     if (window.resizeCanvas) window.resizeCanvas();
 }
 
@@ -162,16 +159,11 @@ function solvePerfectPutt() {
 function initUI() {
     // Settings Modal
     const settingsModal = document.getElementById('settings-modal');
-    document.getElementById('btnSettings').onclick = () => settingsModal.style.display = 'flex';
     document.getElementById('weather-hud').onclick = () => settingsModal.style.display = 'flex';
     document.getElementById('btnCloseSettings').onclick = () => settingsModal.style.display = 'none';
 
     // History Modal
     const historyModal = document.getElementById('history-modal');
-    document.getElementById('btnHistory').onclick = () => {
-        renderHistory();
-        historyModal.style.display = 'flex';
-    };
     document.getElementById('btnCloseHistory').onclick = () => historyModal.style.display = 'none';
 
     // Close on backdrop click

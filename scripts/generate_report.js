@@ -4,16 +4,13 @@ const fs = require('fs');
 const clubs = Object.keys(PhysicsEngine.GOLF_BAG);
 const weatherScenarios = [
     { name: 'SeaLevelNoWind', altitude: 0, temp: 20, windSpeed: 0, windDir: 0 },
-    { name: 'SeaLevelBackWind', altitude: 0, temp: 20, windSpeed: 5, windDir: 0 },
-    { name: 'SeaLevelFrontWind', altitude: 0, temp: 20, windSpeed: 5, windDir: 180 },
-    { name: 'SeaLevelLeftWind', altitude: 0, temp: 20, windSpeed: 5, windDir: 90 },
-    { name: 'SeaLevelRightWind', altitude: 0, temp: 20, windSpeed: 5, windDir: 270 },
-
-    { name: 'HighAltitudeNoWind', altitude: 2500, temp: 0, windSpeed: 0, windDir: 0 },
-    { name: 'HighAltitudeBackWind', altitude: 2500, temp: 0, windSpeed: 5, windDir: 0 },
-    { name: 'HighAltitudeFrontWind', altitude: 2500, temp: 0, windSpeed: 5, windDir: 180 },
-    { name: 'HighAltitudeLeftWind', altitude: 2500, temp: 0, windSpeed: 5, windDir: 90 },
-    { name: 'HighAltitudeRightWind', altitude: 2500, temp: 0, windSpeed: 5, windDir: 270 }
+    { name: 'SeaLevelBackWind_10ms', altitude: 0, temp: 20, windSpeed: 10, windDir: 0 },
+    { name: 'SeaLevelBackWind_20ms', altitude: 0, temp: 20, windSpeed: 20, windDir: 0 },
+    { name: 'SeaLevelFrontWind_10ms', altitude: 0, temp: 20, windSpeed: 10, windDir: 180 },
+    { name: 'SeaLevelFrontWind_20ms', altitude: 0, temp: 20, windSpeed: 20, windDir: 180 },
+    { name: 'SeaLevelSideWind_10ms', altitude: 0, temp: 20, windSpeed: 10, windDir: 90 },
+    { name: 'SeaLevelSideWind_20ms', altitude: 0, temp: 20, windSpeed: 20, windDir: 270 },
+    { name: 'HighAltitude_NoWind', altitude: 2500, temp: 0, windSpeed: 0, windDir: 0 }
 ];
 
 const shots = [
@@ -34,12 +31,12 @@ const speedMap = {
     '8i': 82, '9i': 80, 'PW': 78, 'SW': 75, 'LW': 72
 };
 
-let report = "# Rapport de Test Physique Exhaustif - V8 (Modern/Power Specs)\n\n";
+let report = "# Rapport de Test Physique Exhaustif - V11 (Trackman Grade)\n\n";
 report += "Ce rapport présente les résultats détaillés de la simulation pour chaque club, scénario météo et type de coup.\n\n";
 report += "> [!NOTE]\n";
-report += "> **Moteur Physique V2** : Tuning \"Juste Milieu\" (Lift Base 0.09) + Spin Factor 5.5.\n";
+report += "> **Moteur Physique V11 (Trackman Grade)** : Précision CREPS, Reynolds Number Approximation, Spin Decay (4%/s) et iron Trajectory Flattening.\n";
 report += "> **Vitesse Club** : Variable selon le club (Dr: 105 MPH ... LW: 72 MPH).\n";
-report += "> **Vent** : 5 m/s (18 km/h) pour les tests venteux.\n\n";
+report += "> **Vent** : Variable (10, 20 m/s) pour les tests venteux.\n\n";
 
 report += "## Index des Clubs & Vitesses\n";
 clubs.forEach(k => {

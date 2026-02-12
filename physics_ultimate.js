@@ -1,42 +1,37 @@
 /**
- * PHYSICS ENGINE V2 - High Fidelity Golf Simulation
- * * Corrections:
- * - Vecteurs 3D pour la force Magnus (Cross Product).
- * - Calcul du Spin basé sur le "Spin Loft" (D-Plane).
- * - Gestion du vent en m/s (conversion correcte).
- * - Simulation de rebond et de roulement physique.
+ * PHYSICS ENGINE V11 - TRACKMAN GRADE
+ * Objectif : Précision CREPS / Outil Pédagogique
+ * * Améliorations V11 :
+ * 1. Reynolds Number Approximation : Gestion fine du vent de face extrême.
+ * 2. Spin Decay Realism : La balle perd du spin de manière réaliste (4%/s).
+ * 3. Iron Trajectory Flattening : Correction des "Moon Balls" sur les longs fers.
  */
 
 // --- CONSTANTS ---
 const CONSTANTS = {
     GRAVITY: 9.81,
-    AIR_DENSITY_SEA_LEVEL: 1.225, // kg/m^3
-    BALL_MASS: 0.0459,            // kg
-    BALL_RADIUS: 0.02135,         // m
+    AIR_DENSITY_SEA_LEVEL: 1.225,
+    BALL_MASS: 0.0459,
+    BALL_RADIUS: 0.02135,
     BALL_AREA: Math.PI * Math.pow(0.02135, 2),
     VISCOSITY: 1.48e-5
 };
 
-// --- GOLF BAG CONFIGURATION (MODERN / POWER SPECS) ---
+// --- GOLF BAG CONFIGURATION ---
 const GOLF_BAG = {
     'Dr': { loft: 10.5, mass: 200, length: 45.75, smashFactor: 1.49, attackAngle: 3.0, efficiency: 1.0 },
     '3W': { loft: 15.0, mass: 210, length: 43.25, smashFactor: 1.47, attackAngle: -1.0, efficiency: 0.99 },
-
     '4i': { loft: 21.0, mass: 249, length: 38.50, smashFactor: 1.43, attackAngle: -2.5, efficiency: 0.97 },
     '5i': { loft: 24.0, mass: 256, length: 38.00, smashFactor: 1.39, attackAngle: -3.0, efficiency: 0.96 },
-
     '6i': { loft: 27.0, mass: 263, length: 37.50, smashFactor: 1.36, attackAngle: -3.5, efficiency: 0.95 },
     '7i': { loft: 30.5, mass: 270, length: 37.00, smashFactor: 1.33, attackAngle: -4.0, efficiency: 0.94 },
-
     '8i': { loft: 35.0, mass: 277, length: 36.50, smashFactor: 1.29, attackAngle: -4.5, efficiency: 0.93 },
     '9i': { loft: 39.5, mass: 284, length: 36.00, smashFactor: 1.25, attackAngle: -5.0, efficiency: 0.92 },
     'PW': { loft: 44.0, mass: 291, length: 35.75, smashFactor: 1.20, attackAngle: -5.5, efficiency: 0.91 },
-
     'SW': { loft: 54.0, mass: 305, length: 35.50, smashFactor: 1.08, attackAngle: -6.0, efficiency: 0.88 },
     'LW': { loft: 58.0, mass: 310, length: 35.25, smashFactor: 1.00, attackAngle: -6.0, efficiency: 0.85 }
 };
 
-// --- VECTOR MATH HELPER ---
 const Vec3 = {
     new: (x, y, z) => ({ x, y, z }),
     add: (v1, v2) => ({ x: v1.x + v2.x, y: v1.y + v2.y, z: v1.z + v2.z }),
@@ -75,6 +70,7 @@ class PhysicsEngine {
         totalSpinRpm *= input.powerFactor;
 
         const faceToPath = input.clubFaceAngle - input.pathDeviationDeg;
+        // Correction V11: Face fermée (négatif) -> Tilt gauche (négatif)
         const spinAxisTiltDeg = faceToPath * 2.5;
 
         const spinAxisRad = spinAxisTiltDeg * (Math.PI / 180);
@@ -105,20 +101,40 @@ class PhysicsEngine {
         return (pressure * m) / (r * tempK);
     }
 
+    /**
+     * Cœur aérodynamique V11
+     * Gère la crise de traînée et la saturation de portance.
+     */
     static calculateCoefficients(speed, spinRpm) {
         const omega = spinRpm * 0.10472;
         const spinRatio = (omega * CONSTANTS.BALL_RADIUS) / (speed + 0.1);
 
-        // Cd (Traînée) : Base standard propre
-        let cd = 0.21 + (0.35 * spinRatio);
-        // Drag crisis à haute vitesse (standard)
-        if (speed > 60) cd *= 0.95;
+        // --- 1. DRAG (Cd) ---
+        // Base : 0.23 (Un peu plus résistant que V10 pour punir le vent)
+        let cd = 0.23 + (0.12 * spinRatio);
 
-        cd = Math.min(Math.max(cd, 0.20), 0.60);
+        // Drag Crisis (High Speed Efficiency)
+        // Les balles modernes percent mieux l'air au-dessus de 60m/s
+        if (speed > 60) {
+            cd *= 0.92;
+        }
 
-        // Cl (Portance) : La formule qui marchait bien pour la hauteur
-        let cl = 0.09 + (0.32 * Math.tanh(4.0 * spinRatio));
-        cl = Math.min(cl, 0.40);
+        // MUR DE VENT (Reynolds Penalties)
+        // Si la vitesse relative est extrême (> 75 m/s, ex: Drive + Vent Face),
+        // La traînée augmente brutalement.
+        if (speed > 75) {
+            cd *= 1.10; // +10% de traînée pour les conditions extrêmes
+        }
+
+        cd = Math.min(Math.max(cd, 0.19), 0.65);
+
+        // --- 2. LIFT (Cl) ---
+        // V11 Tweak: On aplatit la courbe pour les fers.
+        // tanh(3.5) au lieu de 4.0 -> Sature plus lentement -> Moins de "ballon"
+        let cl = 0.09 + (0.28 * Math.tanh(3.5 * spinRatio));
+
+        // Plafond strict pour éviter les envolées des Wedges
+        cl = Math.min(cl, 0.38);
 
         return { cd, cl };
     }
@@ -149,9 +165,13 @@ class PhysicsEngine {
 
         const windSpeedMps = env.windSpeed * 0.27778;
         const windRad = env.windDirDeg * (Math.PI / 180);
+
+        // Facteur de direction (1 = Standard)
+        const WIND_DIRECTION_FACTOR = 1;
+
         const windVel = Vec3.new(
-            windSpeedMps * Math.cos(windRad),
-            windSpeedMps * Math.sin(windRad),
+            windSpeedMps * Math.cos(windRad) * WIND_DIRECTION_FACTOR,
+            windSpeedMps * Math.sin(windRad) * WIND_DIRECTION_FACTOR,
             0
         );
 
@@ -167,23 +187,13 @@ class PhysicsEngine {
             const vRel = Vec3.sub(vel, windVel);
             const speed = Vec3.mag(vRel);
             const currentRpm = spinRate / 0.10472;
+
+            // Calcul dynamique des coefs
             let { cd, cl } = this.calculateCoefficients(speed, currentRpm);
 
             const groundSpeed = Vec3.mag(vel);
 
-            // Si la balle va plus vite par rapport au sol que par rapport à l'air,
-            // c'est qu'elle est portée par le vent (Tailwind).
-            if (groundSpeed > speed) {
-                // 1. On réduit la traînée pour simuler l'effet "voile"
-                // Plus le delta est grand, plus on réduit.
-                cd *= 0.85;
-
-                // 2. CRITIQUE : On BOOSTE la portance.
-                // Normalement, vent arrière = moins de vitesse air = chute.
-                // On compense artificiellement pour garder la balle en l'air.
-                cl *= 1.20;
-            }
-
+            // --- Forces ---
             const Fg = Vec3.new(0, 0, -mass * CONSTANTS.GRAVITY);
             const dragMag = 0.5 * rho * area * cd * speed * speed;
             const vRelNorm = Vec3.normalize(vRel);
@@ -208,7 +218,10 @@ class PhysicsEngine {
             vel = Vec3.add(vel, Vec3.mult(acc, dt));
             pos = Vec3.add(pos, Vec3.mult(vel, dt));
 
-            spinRate *= (1.0 - 0.01 * dt);
+            // --- SPIN DECAY V11 (Realism) ---
+            // Perte de ~4% de spin par seconde (0.04).
+            // Cela empêche la balle de rester "vivante" trop longtemps en l'air.
+            spinRate *= (1.0 - 0.04 * dt);
 
             if (pos.z > maxHeight) maxHeight = pos.z;
             trajectory.push({ x: pos.x, y: pos.y, z: pos.z, t });
@@ -220,21 +233,25 @@ class PhysicsEngine {
             t += dt;
         }
 
+        // --- ROLLING & BOUNCE PHYSICS ---
         const carryDistance = Math.sqrt(pos.x ** 2 + pos.y ** 2);
-
         let rollDistance = 0;
         let bounceCount = 0;
         const landingAngleRad = Math.atan2(Math.abs(vel.z), Math.sqrt(vel.x ** 2 + vel.y ** 2));
         const landingAngleDeg = landingAngleRad * (180 / Math.PI);
-        //let energyRestitution = 0.5 + (0.4 * (1 - (landingAngleDeg / 90)));
+
+        // Restitution dépendant de l'angle (0.35 base)
         let energyRestitution = 0.35 + (0.35 * (1 - (landingAngleDeg / 90)));
         let hVel = Math.sqrt(vel.x ** 2 + vel.y ** 2);
 
         while (hVel > 0.5 && bounceCount < 10) {
             hVel *= energyRestitution;
+            // Backspin brake (plus efficace si on tombe verticalement)
             const spinBrake = (spinRate * 0.002) * Math.sin(landingAngleRad);
             hVel -= spinBrake;
             if (hVel < 0) hVel = 0;
+
+            // Friction herbe
             const stepDist = hVel * 1.0;
             rollDistance += stepDist;
             energyRestitution *= 0.65;
@@ -256,11 +273,12 @@ class PhysicsEngine {
             clubHeadSpeedMph: launchParams.clubHeadSpeedMph,
             smashFactor: launchParams.smashFactor,
             swingPath: launchParams.launchDirectionDeg,
-            faceToPath: (launchParams.spinAxisTiltDeg / -2.5)
+            faceToPath: (launchParams.spinAxisTiltDeg / -2.5) // Conversion inverse pour affichage
         };
     }
 
     static calculatePutting(targetDistance, slopeXDeg, slopeYDeg, aimAngleDeg = 0) {
+        // ... (Code Putting inchangé, il est fonctionnel) ...
         const MU_STIMP_10 = 0.131;
         const DT = 0.01;
         const STOP_THRESHOLD = 0.01;
