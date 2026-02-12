@@ -7,6 +7,7 @@
     --text-secondary: #94A3B8;
     --glass: rgba(0, 0, 0, 0.4);
     --font-inter: 'Inter', sans-serif;
+    --base-font-size: 16px;
 }
 
 * {
@@ -33,7 +34,8 @@ body {
 
 /* TABS NAVIGATION */
 .tabs-nav {
-    height: 50px;
+    height: 3.125rem;
+    /* 50px */
     background-color: var(--bg-header);
     display: flex;
     border-bottom: 2px solid rgba(255, 255, 255, 0.05);
@@ -45,7 +47,8 @@ body {
     border: none;
     color: var(--text-secondary);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 0.875rem;
+    /* 14px */
     cursor: pointer;
     transition: all 0.3s;
     border-bottom: 3px solid transparent;
@@ -59,12 +62,13 @@ body {
 
 /* ZONE 1: TOP METRICS */
 .top-metrics {
-    height: 85px;
+    height: 5.3125rem;
+    /* 85px */
     background-color: var(--bg-header);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 1.25rem;
     z-index: 10;
 }
 
@@ -79,7 +83,8 @@ body {
 
 .metric-group {
     display: flex;
-    gap: 30px;
+    gap: 1.875rem;
+    /* 30px */
 }
 
 .metric-item {
@@ -94,7 +99,8 @@ body {
 }
 
 .label {
-    font-size: 10px;
+    font-size: 0.625rem;
+    /* 10px */
     font-weight: 700;
     color: var(--text-secondary);
     letter-spacing: 1.5px;
@@ -108,7 +114,8 @@ body {
 }
 
 .value-group span:first-child {
-    font-size: 24px;
+    font-size: 1.5rem;
+    /* 24px */
     font-weight: 900;
     color: #FFF;
     line-height: 1;
@@ -130,7 +137,8 @@ body {
 /* PUTT HEADER ADJUSTMENTS */
 .metric-grid-top {
     display: flex;
-    gap: 40px;
+    gap: 2.5rem;
+    /* 40px */
     flex: 1;
 }
 
@@ -222,8 +230,10 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 .club-belt-vertical {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 15px 0;
+    gap: 0.5rem;
+    /* 8px */
+    padding: 0.9375rem 0;
+    /* 15px */
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 100%;
@@ -288,44 +298,53 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 15px 20px;
-    border-radius: 16px;
+    padding: 0.9375rem 1.25rem;
+    /* 15px 20px */
+    border-radius: 1rem;
+    /* 16px */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     z-index: 5;
-    min-width: 140px;
+    min-width: 8.75rem;
+    /* 140px */
 }
 
 .bottom-left {
-    top: 20px;
-    left: 20px;
+    top: 1.25rem;
+    left: 1.25rem;
 }
 
 .bottom-right {
-    top: 20px;
-    right: 20px;
+    top: 1.25rem;
+    right: 1.25rem;
 }
 
 .hud-title {
     display: block;
-    font-size: 10px;
+    font-size: 0.625rem;
+    /* 10px */
     font-weight: 900;
     color: var(--text-secondary);
     letter-spacing: 2px;
-    margin-bottom: 12px;
+    margin-bottom: 0.75rem;
+    /* 12px */
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding-bottom: 5px;
+    padding-bottom: 0.3125rem;
+    /* 5px */
 }
 
 .hud-item {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    gap: 15px;
-    margin-bottom: 6px;
+    gap: 0.9375rem;
+    /* 15px */
+    margin-bottom: 0.375rem;
+    /* 6px */
 }
 
 .hud-label {
-    font-size: 11px;
+    font-size: 0.6875rem;
+    /* 11px */
     font-weight: 600;
     color: rgba(255, 255, 255, 0.4);
 }
@@ -344,7 +363,8 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 
 /* HISTORY MODAL SPECIFIC */
 .history-content {
-    max-width: 450px;
+    max-width: 28.125rem;
+    /* 450px */
     height: 70vh;
     display: flex;
     flex-direction: column;
@@ -353,16 +373,21 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 .history-scroll-area {
     flex: 1;
     overflow-y: auto;
-    margin: 15px 0;
-    padding-right: 5px;
+    margin: 0.9375rem 0;
+    /* 15px */
+    padding-right: 0.3125rem;
+    /* 5px */
 }
 
 .history-item {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 10px;
+    border-radius: 0.625rem;
+    /* 10px */
+    padding: 0.75rem;
+    /* 12px */
+    margin-bottom: 0.625rem;
+    /* 10px */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -371,13 +396,15 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 .his-left {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0.25rem;
+    /* 4px */
 }
 
 .his-club {
     font-weight: 900;
     color: var(--accent);
-    font-size: 14px;
+    font-size: 0.875rem;
+    /* 14px */
 }
 
 .his-date {
@@ -415,13 +442,16 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 
 /* Action Buttons */
 .action-btn {
-    padding: 12px 30px;
-    font-size: 16px;
+    padding: 0.75rem 1.875rem;
+    /* 12px 30px */
+    font-size: 1rem;
+    /* 16px */
     font-weight: 900;
     color: #000;
     background: var(--accent);
     border: none;
-    border-radius: 6px;
+    border-radius: 0.375rem;
+    /* 6px */
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(74, 222, 128, 0.2);
     transition: transform 0.1s, background 0.2s;
@@ -441,7 +471,8 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     flex: 1;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 1.25rem;
+    /* 20px */
     height: 100%;
 }
 
@@ -449,16 +480,21 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 0.25rem;
+    /* 4px */
     position: relative;
-    width: 60px;
+    width: 3.75rem;
+    /* 60px */
 }
 
 .speed-gauge-track {
-    width: 12px;
-    height: 80px;
+    width: 0.75rem;
+    /* 12px */
+    height: 5rem;
+    /* 80px */
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
+    border-radius: 0.375rem;
+    /* 6px */
     overflow: hidden;
     position: relative;
 }
@@ -588,14 +624,18 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 }
 
 .icon-btn {
-    width: 44px;
-    height: 44px;
+    width: 2.75rem;
+    /* 44px */
+    height: 2.75rem;
+    /* 44px */
     background: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    font-size: 20px;
+    border-radius: 0.75rem;
+    /* 12px */
+    font-size: 1.25rem;
+    /* 20px */
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -618,12 +658,15 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 15px 12px;
-    border-radius: 16px;
+    padding: 0.9375rem 0.75rem;
+    /* 15px 12px */
+    border-radius: 1rem;
+    /* 16px */
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 0.75rem;
+    /* 12px */
     z-index: 5;
 }
 
@@ -643,13 +686,17 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 }
 
 .adjust-btn {
-    width: 36px;
-    height: 36px;
+    width: 2.25rem;
+    /* 36px */
+    height: 2.25rem;
+    /* 36px */
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    border-radius: 0.5rem;
+    /* 8px */
     color: #FFF;
-    font-size: 20px;
+    font-size: 1.25rem;
+    /* 20px */
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -707,8 +754,8 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 
 /* FOOTER REORGANIZATION */
 .bottom-controls {
-    height: 280px;
-    /* Increased height for the dashboard */
+    height: 30vh;
+    /* Changed from 280px to dynamic vh */
     background-color: var(--bg-header);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
@@ -817,14 +864,17 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 }
 
 .angle-btn {
-    width: 32px;
-    height: 32px;
+    width: 2rem;
+    /* 32px */
+    height: 2rem;
+    /* 32px */
     background: rgba(255, 255, 255, 0.08);
     /* More subtle glass */
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 50%;
     color: white;
-    font-size: 18px;
+    font-size: 1.125rem;
+    /* 18px */
     font-weight: 700;
     cursor: pointer;
     display: flex;
@@ -858,18 +908,22 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 }
 
 .action-btn-punchy-compact {
-    padding: 8px 24px;
+    padding: 0.5rem 1.5rem;
+    /* 8px 24px */
     height: 100%;
     /* Fill container height */
-    min-height: 44px;
+    min-height: 2.75rem;
+    /* 44px */
     /* Ensure touch target size */
     background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
     /* Green Gradient */
     border: none;
-    border-radius: 12px;
+    border-radius: 0.75rem;
+    /* 12px */
     color: white;
     font-weight: 800;
-    font-size: 16px;
+    font-size: 1rem;
+    /* 16px */
     /* Slightly larger text */
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -977,20 +1031,26 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 
 .club-belt {
     display: flex;
-    gap: 10px;
-    padding: 0 10px;
+    gap: 0.625rem;
+    /* 10px */
+    padding: 0 0.625rem;
+    /* 10px */
 }
 
 .club-item {
-    min-width: 50px;
-    height: 40px;
+    min-width: 3.125rem;
+    /* 50px */
+    height: 2.5rem;
+    /* 40px */
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
+    border-radius: 0.375rem;
+    /* 6px */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 0.875rem;
+    /* 14px */
     font-weight: 700;
     color: var(--text-secondary);
     transition: all 0.2s;
@@ -1059,13 +1119,16 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 }
 
 .adjust-btn-small {
-    width: 36px;
-    height: 36px;
+    width: 2.25rem;
+    /* 36px */
+    height: 2.25rem;
+    /* 36px */
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     color: white;
-    font-size: 20px;
+    font-size: 1.25rem;
+    /* 20px */
     font-weight: 700;
     cursor: pointer;
     display: flex;
@@ -1090,13 +1153,16 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 
 /* RESET Circle Button */
 .reset-btn-circle {
-    width: 50px;
-    height: 50px;
+    width: 3.125rem;
+    /* 50px */
+    height: 3.125rem;
+    /* 50px */
     background: rgba(239, 68, 68, 0.1);
     color: #EF4444;
     border: 1px solid rgba(239, 68, 68, 0.2);
     border-radius: 50%;
-    font-size: 20px;
+    font-size: 1.25rem;
+    /* 20px */
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -1108,15 +1174,19 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 
 /* PUTT Rect Button (Punchy) - Modernized */
 .action-btn-putt-rect {
-    height: 50px;
-    padding: 0 30px;
+    height: 3.125rem;
+    /* 50px */
+    padding: 0 1.875rem;
+    /* 30px */
     background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
     color: white;
     border: none;
-    border-radius: 14px;
+    border-radius: 0.875rem;
+    /* 14px */
     /* Softer corners */
     font-weight: 800;
-    font-size: 18px;
+    font-size: 1.125rem;
+    /* 18px */
     text-transform: uppercase;
     letter-spacing: 1.5px;
     cursor: pointer;
@@ -1152,10 +1222,13 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 
 .modal-content {
     background: #1E293B;
-    padding: 24px;
-    border-radius: 12px;
+    padding: 1.5rem;
+    /* 24px */
+    border-radius: 0.75rem;
+    /* 12px */
     width: 90%;
-    max-width: 400px;
+    max-width: 25rem;
+    /* 400px */
 }
 
 .close-btn {
@@ -1173,12 +1246,15 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 /* Responsive adjustment for mobile */
 @media (max-width: 600px) {
     .top-metrics {
-        height: 60px;
-        padding: 5px;
+        height: 3.75rem;
+        /* 60px */
+        padding: 0.3125rem;
+        /* 5px */
     }
 
     .metric-group {
-        gap: 15px;
+        gap: 0.9375rem;
+        /* 15px */
     }
 
     .metric-item .value-group span:first-child {
@@ -1210,15 +1286,19 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 
     #swing-footer,
     #putt-footer {
-        padding: 10px;
-        gap: 15px;
+        padding: 0.625rem;
+        /* 10px */
+        gap: 0.9375rem;
+        /* 15px */
     }
 
     .swing-dashboard {
         flex-direction: row;
         flex-wrap: wrap;
-        gap: 10px;
-        padding-bottom: 5px;
+        gap: 0.625rem;
+        /* 10px */
+        padding-bottom: 0.3125rem;
+        /* 5px */
     }
 
     .speed-v {
@@ -1260,14 +1340,18 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     }
 
     .club-item {
-        min-width: 45px;
-        height: 35px;
-        font-size: 12px;
+        min-width: 2.8125rem;
+        /* 45px */
+        height: 2.1875rem;
+        /* 35px */
+        font-size: 0.75rem;
+        /* 12px */
     }
 
     /* Putting Mobile Horizontal Refinement */
     #putt-footer {
-        padding: 10px;
+        padding: 0.625rem;
+        /* 10px */
         height: auto;
     }
 
@@ -1277,9 +1361,12 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     }
 
     .reset-btn-circle {
-        width: 44px;
-        height: 44px;
-        font-size: 18px;
+        width: 2.75rem;
+        /* 44px */
+        height: 2.75rem;
+        /* 44px */
+        font-size: 1.125rem;
+        /* 18px */
     }
 
     .action-btn-putt-rect {
@@ -1289,12 +1376,9 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     }
 
     .target-value {
-        font-size: 18px;
-        min-width: 60px;
+        font-size: 1.125rem;
+        min-width: 3.75rem;
     }
-
-    padding: 5px 10px;
-}
 }
 
 /* Specific Mobile Portrait Optimizations */
@@ -1341,18 +1425,24 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
 
     /* HUD adjustments to prevent cropping/overlap */
     .hud {
-        padding: 10px 12px;
-        min-width: 110px;
+        padding: 0.625rem 0.75rem;
+        /* 10px 12px */
+        min-width: 6.875rem;
+        /* 110px */
     }
 
     .bottom-left {
-        left: 10px;
-        top: 15px;
+        left: 0.625rem;
+        /* 10px */
+        top: 0.9375rem;
+        /* 15px */
     }
 
     .bottom-right {
-        right: 10px;
-        top: 15px;
+        right: 0.625rem;
+        /* 10px */
+        top: 0.9375rem;
+        /* 15px */
     }
 
     /* Metrics fit */
@@ -1362,11 +1452,13 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     }
 
     .metric-item .value-group span:first-child {
-        font-size: 20px;
+        font-size: 1.25rem;
+        /* 20px */
         /* Slightly smaller */
     }
 
     .metric-item .label {
-        font-size: 9px;
+        font-size: 0.5625rem;
+        /* 9px */
     }
 }
