@@ -73,16 +73,41 @@ window.calculateChip = function () {
     const result = PhysicsEngine.simulateChipping(params, appState.weather, greenSpeed);
     appState.trajectoryResult = result;
     animate(result);
-    updateChipMetrics(result);
+    window.updateChipMetrics(result, params);
     addHistoryItem('Chip', result);
 };
 
-function updateChipMetrics(res) {
-    document.getElementById('chip-val-carry').textContent = res.carryDistance.toFixed(1);
-    document.getElementById('chip-val-roll').textContent = res.rollDistance.toFixed(1);
-    document.getElementById('chip-val-total').textContent = res.totalDistance.toFixed(1);
-    document.getElementById('chip-val-apex').textContent = res.maxHeight.toFixed(1);
-    document.getElementById('chip-val-ratio').textContent = Math.round((res.rollDistance / res.totalDistance * 100) || 0);
-    document.getElementById('chip-val-loft').textContent = res.launchAngleDeg.toFixed(1);
-    document.getElementById('chip-val-spin').textContent = Math.round(res.spinRpm);
-}
+window.updateChipMetrics = function (res, params) {
+    console.log("Updating Chip Metrics:", res);
+    console.log("Launch Params:", params);
+
+    const carry = document.getElementById('chip-val-carry');
+    const roll = document.getElementById('chip-val-roll');
+    const total = document.getElementById('chip-val-total');
+    const apex = document.getElementById('chip-val-apex');
+    const ratio = document.getElementById('chip-val-ratio');
+    const loft = document.getElementById('chip-val-loft');
+    const spin = document.getElementById('chip-val-spin');
+
+    if (carry) carry.textContent = res.carryDistance.toFixed(1);
+    if (roll) roll.textContent = res.rollDistance.toFixed(1);
+    if (total) total.textContent = res.totalDistance.toFixed(1);
+    if (apex) apex.textContent = res.maxHeight.toFixed(1);
+    if (ratio) ratio.textContent = Math.round((res.rollDistance / res.totalDistance * 100) || 0);
+
+    // Display dynamic loft (launch angle) from launch params
+    if (loft && params) {
+        loft.textContent = params.launchAngleDeg.toFixed(1);
+        console.log("Dynamic Loft set to:", params.launchAngleDeg.toFixed(1));
+    } else {
+        console.error("chip-val-loft element not found or params missing!");
+    }
+
+    // Display spin rate at launch from launch params
+    if (spin && params) {
+        spin.textContent = Math.round(params.backSpinRpm);
+        console.log("Spin set to:", Math.round(params.backSpinRpm));
+    } else {
+        console.error("chip-val-spin element not found or params missing!");
+    }
+};

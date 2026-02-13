@@ -1,0 +1,128 @@
+FAIL tests/chipping.test.js
+  Chipping Engine Matrix Analysis
+    1. Bag Graduation Matrix (Stimp 10 / Center Ball)
+      Club: PW
+        ÔêÜ Speed: 10 mph (7 ms)
+        ÔêÜ Speed: 20 mph (4 ms)
+        ÔêÜ Speed: 30 mph (4 ms)
+        ÔêÜ Speed: 40 mph (5 ms)
+      Club: SW
+        ÔêÜ Speed: 10 mph (5 ms)
+        ÔêÜ Speed: 20 mph (3 ms)
+        ÔêÜ Speed: 30 mph (3 ms)
+        ÔêÜ Speed: 40 mph (5 ms)
+      Club: LW
+        ├ù Speed: 10 mph (3 ms)
+        ÔêÜ Speed: 20 mph (5 ms)
+        ÔêÜ Speed: 30 mph (5 ms)
+        ÔêÜ Speed: 40 mph (6 ms)
+      Club: 7i
+        ÔêÜ Speed: 10 mph (1 ms)
+        ÔêÜ Speed: 20 mph (2 ms)
+        ÔêÜ Speed: 30 mph (2 ms)
+        ÔêÜ Speed: 40 mph (4 ms)
+      Club: Put
+        ├ù Speed: 10 mph
+        ├ù Speed: 20 mph
+        ├ù Speed: 30 mph (1 ms)
+        ├ù Speed: 40 mph (2 ms)
+    2. Green Speed Sensitivity (SW @ 20mph)
+      ÔêÜ Roll distance must increase with Stimp (4 ms)
+      ÔêÜ Carry should remain identical regardless of green speed (3 ms)
+    3. Technique Impact: Ball Position (PW @ 25mph)
+      ÔêÜ Balle arri├¿re (-15cm) : Trajectoire basse / Plus de roule (2 ms)
+      ÔêÜ Balle avant (+15cm) : Trajectoire haute / Stop plus rapide (3 ms)
+    4. Edge Cases and Safety
+      ÔêÜ Very low power (5mph) should still register a shot (1 ms)
+      ÔêÜ Extreme wind on a chip should have minimal but non-zero effect (2 ms)
+
+  ÔùÅ Chipping Engine Matrix Analysis ÔÇ║ 1. Bag Graduation Matrix (Stimp 10 / Center Ball) ÔÇ║ Club: LW ÔÇ║ Speed: 10 mph
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0.5
+    Received:   0.5
+
+      37 |                             const pwParams = PhysicsEngine.calculateLaunchParams(input, PhysicsEngine.GOLF_BAG['PW']);
+      38 |                             const pwRes = PhysicsEngine.simulateChipping(pwParams, standardWeather, 10);
+    > 39 |                             expect(result.maxHeight).toBeGreaterThan(pwRes.maxHeight);
+         |                                                      ^
+      40 |                         }
+      41 |                     });
+      42 |                 });
+
+      at Object.toBeGreaterThan (Documents/Dev_NM/Golf_Lab_NM/tests/chipping.test.js:39:54)
+
+  ÔùÅ Chipping Engine Matrix Analysis ÔÇ║ 1. Bag Graduation Matrix (Stimp 10 / Center Ball) ÔÇ║ Club: Put ÔÇ║ Speed: 10 mph
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+      31 |                         // V├®rification de la coh├®rence physique
+      32 |                         expect(result.totalDistance).toBeGreaterThan(result.carryDistance);
+    > 33 |                         expect(result.maxHeight).toBeGreaterThan(0);
+         |                                                  ^
+      34 |
+      35 |                         // Logique de sac : Le LW doit toujours voler plus haut que le PW ├á vitesse ├®gale
+      36 |                         if (clubKey === 'LW') {
+
+      at Object.toBeGreaterThan (Documents/Dev_NM/Golf_Lab_NM/tests/chipping.test.js:33:50)
+
+  ÔùÅ Chipping Engine Matrix Analysis ÔÇ║ 1. Bag Graduation Matrix (Stimp 10 / Center Ball) ÔÇ║ Club: Put ÔÇ║ Speed: 20 mph
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+      31 |                         // V├®rification de la coh├®rence physique
+      32 |                         expect(result.totalDistance).toBeGreaterThan(result.carryDistance);
+    > 33 |                         expect(result.maxHeight).toBeGreaterThan(0);
+         |                                                  ^
+      34 |
+      35 |                         // Logique de sac : Le LW doit toujours voler plus haut que le PW ├á vitesse ├®gale
+      36 |                         if (clubKey === 'LW') {
+
+      at Object.toBeGreaterThan (Documents/Dev_NM/Golf_Lab_NM/tests/chipping.test.js:33:50)
+
+  ÔùÅ Chipping Engine Matrix Analysis ÔÇ║ 1. Bag Graduation Matrix (Stimp 10 / Center Ball) ÔÇ║ Club: Put ÔÇ║ Speed: 30 mph
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+      31 |                         // V├®rification de la coh├®rence physique
+      32 |                         expect(result.totalDistance).toBeGreaterThan(result.carryDistance);
+    > 33 |                         expect(result.maxHeight).toBeGreaterThan(0);
+         |                                                  ^
+      34 |
+      35 |                         // Logique de sac : Le LW doit toujours voler plus haut que le PW ├á vitesse ├®gale
+      36 |                         if (clubKey === 'LW') {
+
+      at Object.toBeGreaterThan (Documents/Dev_NM/Golf_Lab_NM/tests/chipping.test.js:33:50)
+
+  ÔùÅ Chipping Engine Matrix Analysis ÔÇ║ 1. Bag Graduation Matrix (Stimp 10 / Center Ball) ÔÇ║ Club: Put ÔÇ║ Speed: 40 mph
+
+    expect(received).toBeGreaterThan(expected)
+
+    Expected: > 0
+    Received:   0
+
+      31 |                         // V├®rification de la coh├®rence physique
+      32 |                         expect(result.totalDistance).toBeGreaterThan(result.carryDistance);
+    > 33 |                         expect(result.maxHeight).toBeGreaterThan(0);
+         |                                                  ^
+      34 |
+      35 |                         // Logique de sac : Le LW doit toujours voler plus haut que le PW ├á vitesse ├®gale
+      36 |                         if (clubKey === 'LW') {
+
+      at Object.toBeGreaterThan (Documents/Dev_NM/Golf_Lab_NM/tests/chipping.test.js:33:50)
+
+Test Suites: 1 failed, 1 total
+Tests:       5 failed, 21 passed, 26 total
+Snapshots:   0 total
+Time:        0.714 s, estimated 2 s
+Ran all test suites matching tests/chipping.test.js.
