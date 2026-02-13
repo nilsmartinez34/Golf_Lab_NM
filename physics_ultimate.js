@@ -29,7 +29,8 @@ const GOLF_BAG = {
     '9i': { loft: 39.5, mass: 284, length: 36.00, smashFactor: 1.25, attackAngle: -5.0, efficiency: 0.92 },
     'PW': { loft: 44.0, mass: 291, length: 35.75, smashFactor: 1.20, attackAngle: -5.5, efficiency: 0.91 },
     'SW': { loft: 54.0, mass: 305, length: 35.50, smashFactor: 1.08, attackAngle: -6.0, efficiency: 0.88 },
-    'LW': { loft: 58.0, mass: 310, length: 35.25, smashFactor: 1.00, attackAngle: -6.0, efficiency: 0.85 }
+    'LW': { loft: 58.0, mass: 310, length: 35.25, smashFactor: 1.00, attackAngle: -6.0, efficiency: 0.85 },
+    'Put': { loft: 3.5, mass: 330, length: 34.00, smashFactor: 1.00, attackAngle: 0.0, efficiency: 1.00 }
 };
 
 const Vec3 = {
@@ -274,6 +275,167 @@ class PhysicsEngine {
             smashFactor: launchParams.smashFactor,
             swingPath: launchParams.launchDirectionDeg,
             faceToPath: (launchParams.spinAxisTiltDeg / -2.5) // Conversion inverse pour affichage
+        };
+    }
+
+    /**
+     * Calculates the rolling phase specifically for chipping/putting
+     */
+    static calculateRoll(landingState, greenSpeed = 10) {
+        let pos = landingState.pos; // Helper ref
+        // pos is actually a reference to the vector in landingState? 
+        // No, landingState comes from simulateTrajectory which pushes new objects to path.
+        // But landingState might be the last object.
+        // Let's ensure we work on copies if needed, but here we just need start values.
+
+        // We need mutable vectors for the loop
+        // landingState.velocity is {x,y,z}
+        let vel = { ...landingState.velocity };
+        let posC = { ...landingState.pos }; // Current Pos copy
+
+        let spinRate = landingState.spinRate;
+
+        // Zero out Z velocity/pos for pure roll start (physics simplification)
+        vel.z = 0;
+        posC.z = 0;
+
+        let rollPath = [];
+        let t = 0;
+        const dt = 0.01;
+        const g = CONSTANTS.GRAVITY;
+
+        // Green Speed to friction coefficient approx
+        // Stimp 10 -> mu ~ 0.13
+        // Formula: mu = 1.3 / Stimp ?? 
+        // Stimp 10ft => ball rolls 10ft.
+        // v^2 = 2*mu*g*d => mu = v^2 / (2*g*d)
+        // Common approx: mu = 1.3 / Stimp is a bit simplistic but works for games.
+        const muBase = 1.3 / greenSpeed;
+
+        let isRolling = true;
+        let rollDist = 0;
+
+        // Push start point
+        rollPath.push({ x: posC.x, y: posC.y, z: 0, t: 0 }); // Relative time
+
+        while (isRolling && t < 10.0) {
+            const speed = Math.sqrt(vel.x * vel.x + vel.y * vel.y);
+            if (speed < 0.05) {
+                isRolling = false;
+                break;
+            }
+
+            // Friction Model:
+            // 1. Base friction from green speed
+            // 2. Spin Influence: Backspin increases friction, Topspin decreases it
+            // Spin is in rad/s. Positive = Backspin.
+            // A high backspin should act as a brake.
+
+            // Normalized spin factor (approx 5000rpm = 523 rad/s)
+            // We want significant braking effect from backspin
+            const spinFactor = (spinRate * 0.001);
+
+            // Effective Friction
+            let muEff = muBase * (1.0 + spinFactor);
+
+            // Deceleration
+            const decel = g * muEff;
+
+            // Update Velocity
+            const speedNew = speed - (decel * dt);
+
+            if (speedNew <= 0) {
+                vel.x = 0; vel.y = 0;
+                isRolling = false;
+            } else {
+                const ratio = speedNew / speed;
+                vel.x *= ratio;
+                vel.y *= ratio;
+            }
+
+            // Update Position
+            posC.x += vel.x * dt;
+            posC.y += vel.y * dt;
+
+            rollPath.push({ x: posC.x, y: posC.y, z: 0, t: t + dt });
+
+            // Spin Decay during roll (friction eats spin)
+            spinRate *= (1.0 - 2.0 * dt); // Fast decay on ground
+
+            t += dt;
+        }
+
+        // Calculate total distance from start of roll
+        if (rollPath.length > 0) {
+            const start = rollPath[0];
+            const end = rollPath[rollPath.length - 1];
+            rollDist = Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2);
+        }
+
+        return {
+            rollPath: rollPath,
+            rollDistance: rollDist
+        };
+    }
+
+    static simulateChipping(launchParams, environment = {}, greenSpeed = 10) {
+        // 1. Calculate Flight
+        const flightResult = this.simulateTrajectory(launchParams, environment);
+
+        // RECONSTRUCT LANDING STATE
+        const path = flightResult.path;
+
+        // --- PUTTER FIX: Handle immediate landing ---
+        let vx = 0, vy = 0, vz = 0;
+        let last = path.length > 0 ? path[path.length - 1] : { x: 0, y: 0, z: 0, t: 0 };
+
+        if (path.length > 1) {
+            // Normal flight: Calc velocity from last 2 points
+            const prev = path[path.length - 2];
+            const dt = last.t - prev.t;
+            if (dt > 0) {
+                vx = (last.x - prev.x) / dt;
+                vy = (last.y - prev.y) / dt;
+                vz = (last.z - prev.z) / dt;
+            }
+        } else {
+            // Immediate Ground Contact (Putter with 0 loft)
+            // Use launch velocity approx
+            const launchRad = launchParams.launchAngleDeg * (Math.PI / 180);
+            const dirRad = launchParams.launchDirectionDeg * (Math.PI / 180);
+            const speed = launchParams.ballSpeedMps; // m/s
+
+            vx = speed * Math.cos(launchRad) * Math.cos(dirRad);
+            vy = speed * Math.cos(launchRad) * Math.sin(dirRad);
+            vz = speed * Math.sin(launchRad);
+
+            // Ensure pos is at least 0,0,0 if path was empty
+            if (path.length === 0) last = { x: 0, y: 0, z: 0, t: 0 };
+        }
+
+        const landingState = {
+            pos: { x: last.x, y: last.y, z: last.z },
+            velocity: { x: vx, y: vy, z: vz },
+            spinRate: flightResult.spinRpm * 0.10472 // Approx residual spin (rad/s)
+        };
+
+        // 2. Calculate Roll
+        const rollResult = this.calculateRoll(landingState, greenSpeed);
+
+        // 3. Merge Results
+        const flightTime = flightResult.flightTimeSeconds;
+        // Shift time for roll points
+        rollResult.rollPath.forEach(p => p.t += flightTime);
+
+        const fullPath = flightResult.path.concat(rollResult.rollPath);
+
+        return {
+            ...flightResult,
+            rollDistance: parseFloat(rollResult.rollDistance.toFixed(1)),
+            totalDistance: parseFloat((flightResult.carryDistance + rollResult.rollDistance).toFixed(1)),
+            path: fullPath,
+            flightPathEndIndex: flightResult.path.length,
+            isChip: true
         };
     }
 

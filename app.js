@@ -28,7 +28,11 @@ const appState = {
         temp: 20,
         windSpeed: 0,
         windDir: 0
-    }
+    },
+
+    // Chipping specific
+    chipBallPos: 0, // cm (-20 to +20)
+    chipGreenSpeed: 10
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -49,12 +53,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initTabs() {
     const tabSwing = document.getElementById('tab-swing');
+    const tabChip = document.getElementById('tab-chip');
     const tabPutt = document.getElementById('tab-putt');
 
     tabSwing.onclick = () => {
         appState.mode = 'swing';
         updateModeUI();
     };
+    if (tabChip) {
+        tabChip.onclick = () => {
+            appState.mode = 'chip';
+            updateModeUI();
+        };
+    }
     tabPutt.onclick = () => {
         appState.mode = 'putt';
         updateModeUI();
@@ -63,20 +74,41 @@ function initTabs() {
 
 function updateModeUI() {
     const isSwing = appState.mode === 'swing';
+    const isChip = appState.mode === 'chip';
+    const isPutt = appState.mode === 'putt';
 
     // Tab active states
     document.getElementById('tab-swing').classList.toggle('active', isSwing);
-    document.getElementById('tab-putt').classList.toggle('active', !isSwing);
+    if (document.getElementById('tab-chip')) {
+        document.getElementById('tab-chip').classList.toggle('active', isChip);
+    }
+    document.getElementById('tab-putt').classList.toggle('active', isPutt);
 
     // Content visibility
     document.getElementById('swing-content').style.display = isSwing ? 'block' : 'none';
-    document.getElementById('putt-content').style.display = isSwing ? 'none' : 'block';
+    if (document.getElementById('chip-content')) {
+        document.getElementById('chip-content').style.display = isChip ? 'block' : 'none';
+    }
+    document.getElementById('putt-content').style.display = isPutt ? 'block' : 'none';
+
+    // Footer visibility
     document.getElementById('swing-footer').style.display = isSwing ? 'flex' : 'none';
-    document.getElementById('putt-footer').style.display = isSwing ? 'none' : 'flex';
+    if (document.getElementById('chip-footer')) {
+        document.getElementById('chip-footer').style.display = isChip ? 'flex' : 'none';
+    }
+    document.getElementById('putt-footer').style.display = isPutt ? 'flex' : 'none';
 
     // Metrics Header Swap
     document.getElementById('swing-metrics-header').style.display = isSwing ? 'flex' : 'none';
-    document.getElementById('putt-metrics-header').style.display = isSwing ? 'none' : 'flex';
+    if (document.getElementById('chip-metrics-header')) {
+        document.getElementById('chip-metrics-header').style.display = isChip ? 'flex' : 'none';
+    }
+    document.getElementById('putt-metrics-header').style.display = isPutt ? 'flex' : 'none';
+
+    if (isChip) {
+        // Timeout to ensure DOM is ready? No, should be fine, but let's be safe
+        setTimeout(() => { if (window.initChipUI) window.initChipUI(); }, 50);
+    }
 
     if (window.resizeCanvas) window.resizeCanvas();
 }
@@ -418,6 +450,11 @@ function initMainCanvas() {
             if (appState.trajectoryResult && !appState.trajectoryResult.isPutt && !appState.isAnimating) {
                 drawPersistentSwingTrajectory(appState.trajectoryResult);
             }
+        } else if (appState.mode === 'chip') {
+            drawChipProfile();
+            if (appState.trajectoryResult && !appState.trajectoryResult.isPutt && !appState.isAnimating) {
+                drawPersistentChipProfile(appState.trajectoryResult);
+            }
         } else {
             drawPuttGrid();
             if (appState.trajectoryResult && appState.trajectoryResult.isPutt && !appState.isAnimating) {
@@ -477,6 +514,48 @@ function initMainCanvas() {
             ctx.fillText(`${d}m`, 10, y - 5);
         }
     }
+
+    function drawChipProfile() {
+        const groundY = canvas.height * 0.85;
+
+        // Sky
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, groundY);
+        skyGrad.addColorStop(0, '#1E3A8A');
+        skyGrad.addColorStop(1, '#3B82F6');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, canvas.width, groundY);
+
+        // Ground
+        ctx.fillStyle = '#15803D';
+        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+
+        // Grid Lines (Vertical - Distance)
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 1;
+        ctx.font = '10px Inter';
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.textAlign = 'center';
+
+        const maxDist = 80; // Meters
+        const pxPerM = canvas.width / maxDist;
+
+        for (let d = 0; d <= maxDist; d += 10) {
+            const x = d * pxPerM;
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            ctx.fillText(`${d}m`, x, groundY + 15);
+        }
+
+        // Horizontal (Height) - Optional
+        for (let h = 5; h <= 20; h += 5) {
+            const y = groundY - (h * pxPerM); // Aspect ratio maintained? 
+            // Maybe stretch Y for better viz? Let's use 3x vertical exaggeration
+            const yEx = groundY - (h * pxPerM * 3);
+            ctx.beginPath(); ctx.moveTo(0, yEx); ctx.lineTo(canvas.width, yEx); ctx.stroke();
+        }
+    }
+
+
+
 
     function drawPuttGrid() {
         ctx.fillStyle = '#064E3B'; // Dark green
@@ -583,6 +662,43 @@ function initMainCanvas() {
         }
     }
 
+    function drawPersistentChipProfile(result) {
+        const groundY = canvas.height * 0.85;
+        const maxDist = 80;
+        const pxPerM = canvas.width / maxDist;
+        const verticalExaggeration = 3.0;
+
+        const flightEnd = result.flightPathEndIndex || result.path.length;
+
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        // 1. Flight (White)
+        ctx.strokeStyle = 'white';
+        for (let i = 0; i < flightEnd; i++) {
+            const p = result.path[i];
+            // X = Distance (p.x), Y = Height (p.z)
+            // Note: In global coords, x is forward, z is up.
+            const cx = p.x * pxPerM;
+            const cy = groundY - (p.z * pxPerM * verticalExaggeration);
+
+            if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+        }
+        ctx.stroke();
+
+        // 2. Roll (Yellow)
+        ctx.beginPath();
+        ctx.strokeStyle = '#FACC15';
+        for (let i = flightEnd - 1; i < result.path.length; i++) {
+            if (i < 0) continue;
+            const p = result.path[i];
+            const cx = p.x * pxPerM;
+            const cy = groundY - (p.z * pxPerM * verticalExaggeration);
+            if (i === flightEnd - 1) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+        }
+        ctx.stroke();
+    }
+
     window.calculateSwing = function () {
         const input = {
             clubSpeedMph: appState.power * appState.speedFactor,
@@ -665,39 +781,83 @@ function initMainCanvas() {
                         ctx.beginPath(); ctx.arc(ax, ay, 4, 0, Math.PI * 2); ctx.fill();
                     }
                 }
+            } else if (appState.mode === 'chip') {
+                // CHIP ANIMATION (2D Profile with Exaggerated Height)
+                const groundY = canvas.height * 0.85;
+                const maxDist = 80;
+                const pxPerM = canvas.width / maxDist;
+                const verticalImg = 3.0;
 
-            }
-            else {
+                const flightEnd = result.flightPathEndIndex || result.path.length;
+
+                // Trace
+                ctx.beginPath();
+                for (let i = 0; i <= frame; i++) {
+                    const p = result.path[i];
+                    // Global: X=Forward, Z=Up
+                    const cx = p.x * pxPerM;
+                    const cy = groundY - (p.z * pxPerM * verticalImg);
+
+                    if (i === flightEnd) {
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.strokeStyle = '#FACC15'; // Gold for roll
+                        ctx.moveTo(cx, cy);
+                    } else if (i === 0) {
+                        ctx.moveTo(cx, cy);
+                        ctx.strokeStyle = '#FFFFFF';
+                    } else {
+                        ctx.lineTo(cx, cy);
+                    }
+                }
+                ctx.stroke();
+
+                // Ball
+                const p = result.path[frame];
+                const cx = p.x * pxPerM;
+                const cy = groundY - (p.z * pxPerM * verticalImg);
+
+                ctx.fillStyle = 'white';
+                ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
+            } else {
                 const hY = canvas.height * 0.38;
                 const gY = canvas.height * 0.88;
                 const gR = gY - hY;
                 const k = 0.0052;
-                const VIEW_SCALE = 20.0; // Même constante que pour la trace persistante
+                const VIEW_SCALE = 20.0;
 
-                // Dessiner la trace
+                // Draw Trace
                 ctx.beginPath();
+                const flightEnd = result.flightPathEndIndex || result.path.length;
+
                 for (let i = 0; i <= frame; i++) {
                     const p = result.path[i];
                     const sc = Math.exp(-k * p.x);
-
-                    // CORRECTION: p.y pour latéral, p.z pour hauteur
                     const sx = (canvas.width * 0.5) + (p.y * sc * VIEW_SCALE);
                     const sy = (hY + (gR * sc)) - (p.z * sc * VIEW_SCALE);
 
-                    if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+                    // Change color after flight end
+                    if (i === flightEnd) {
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.strokeStyle = '#FACC15'; // Gold for roll
+                        ctx.moveTo(sx, sy);
+                    } else if (i === 0) {
+                        ctx.moveTo(sx, sy);
+                        ctx.strokeStyle = '#FFFFFF';
+                    } else {
+                        ctx.lineTo(sx, sy);
+                    }
                 }
                 ctx.stroke();
 
-                // Dessiner la balle
+                // Draw Ball
                 const p = result.path[frame];
                 const sc = Math.exp(-k * p.x);
-
-                // CORRECTION: Idem
                 const sx = (canvas.width * 0.5) + (p.y * sc * VIEW_SCALE);
                 const sy = (hY + (gR * sc)) - (p.z * sc * VIEW_SCALE);
 
                 ctx.fillStyle = 'white';
-                // La balle rétrécit avec la distance
                 ctx.beginPath(); ctx.arc(sx, sy, Math.max(2, 6 * sc), 0, Math.PI * 2); ctx.fill();
             }
             frame += 2;
@@ -753,7 +913,7 @@ function initMainCanvas() {
             div.className = 'history-item';
             div.innerHTML = `
                 <div class="his-left">
-                    <span class="his-club">${h.type === 'Swing' ? h.club : 'PUTTER'}</span>
+                    <span class="his-club">${(h.type === 'Swing' || h.type === 'Chip') ? h.club : 'PUTTER'}</span>
                     <span class="his-date">${h.date}</span>
                 </div>
                 <div class="his-metrics">
@@ -776,5 +936,113 @@ function initMainCanvas() {
         document.getElementById('putt-val-playas').textContent = playAs.toFixed(2).replace('.', ',');
 
         document.getElementById('putt-val-apex').textContent = `${apex.x.toFixed(2).replace('.', ',')} / ${apex.y.toFixed(2).replace('.', ',')}`;
+    }
+
+    // --- CHIPPING MODE LOGIC ---
+    window.initChipUI = function () {
+        const clubSelect = document.getElementById('chip-club-select');
+        if (clubSelect && clubSelect.innerHTML === '') {
+            Object.keys(PhysicsEngine.GOLF_BAG).forEach(code => {
+                const opt = document.createElement('option');
+                opt.value = code;
+                opt.textContent = code;
+                if (code === 'SW') opt.selected = true;
+                clubSelect.appendChild(opt);
+            });
+        }
+
+        // Ball Position Buttons
+        const btnMinus = document.getElementById('btn-pos-minus');
+        const btnPlus = document.getElementById('btn-pos-plus');
+        const posLabel = document.getElementById('val-ball-pos');
+
+        if (btnMinus) {
+            btnMinus.onclick = () => {
+                appState.chipBallPos = Math.max(-20, appState.chipBallPos - 1);
+                if (posLabel) posLabel.textContent = `${appState.chipBallPos > 0 ? '+' : ''}${appState.chipBallPos} cm`;
+            };
+        }
+        if (btnPlus) {
+            btnPlus.onclick = () => {
+                appState.chipBallPos = Math.min(20, appState.chipBallPos + 1);
+                if (posLabel) posLabel.textContent = `${appState.chipBallPos > 0 ? '+' : ''}${appState.chipBallPos} cm`;
+            };
+        }
+
+        const powerInput = document.getElementById('chip-input-power');
+        if (powerInput) {
+            powerInput.oninput = (e) => {
+                const val = e.target.value;
+                document.getElementById('chip-speed-label').textContent = `${val} MPH`;
+            };
+        }
+
+        const btnGreen = document.getElementById('btn-green-speed');
+        if (btnGreen) {
+            btnGreen.onclick = () => {
+                const speeds = [8, 10, 12];
+                let curr = parseInt(btnGreen.textContent.split(' ')[1]);
+                let next = speeds[(speeds.indexOf(curr) + 1) % speeds.length];
+                btnGreen.textContent = `GRN ${next}`;
+                appState.chipGreenSpeed = next;
+            };
+        }
+
+        const btnChip = document.getElementById('btnChip');
+        if (btnChip) {
+            btnChip.onclick = () => window.calculateChip();
+        }
+    };
+
+    window.calculateChip = function () {
+        const clubCode = document.getElementById('chip-club-select').value;
+        const club = PhysicsEngine.GOLF_BAG[clubCode];
+        const powerStr = document.getElementById('chip-input-power').value;
+        const power = parseFloat(powerStr);
+        const greenSpeed = appState.chipGreenSpeed || 10;
+
+        // Ball Position adjustment
+        // 1cm back (-1) = -0.5 deg Dynamic Loft and -0.5 deg Attack Angle (Steeper)
+        // 0cm = Standard
+        const pos = appState.chipBallPos;
+        const loftAdj = pos * 0.5;
+        const attackAdj = pos * 0.5;
+
+        const input = {
+            clubSpeedMph: power,
+            powerFactor: 1.0,
+            efficiency: 1.0,
+            pathDeviationDeg: 0,
+            clubFaceAngle: 0
+        };
+
+        const params = PhysicsEngine.calculateLaunchParams(input, club, club.attackAngle + attackAdj);
+        // Overwrite launchAngleDeg for true "Dynamic Loft" simulation from ball position
+        params.launchAngleDeg += loftAdj;
+
+        const result = PhysicsEngine.simulateChipping(params, appState.weather, greenSpeed);
+
+        appState.trajectoryResult = result;
+        animate(result);
+        updateChipMetrics(result);
+        addHistoryItem('Chip', result);
+    };
+
+    function updateChipMetrics(res) {
+        document.getElementById('chip-val-carry').textContent = res.carryDistance.toFixed(1);
+        document.getElementById('chip-val-roll').textContent = res.rollDistance.toFixed(1);
+        document.getElementById('chip-val-total').textContent = res.totalDistance.toFixed(1);
+        document.getElementById('chip-val-apex').textContent = res.maxHeight.toFixed(1);
+
+        const ratio = (res.rollDistance / res.totalDistance * 100) || 0;
+        document.getElementById('chip-val-ratio').textContent = Math.round(ratio);
+
+        // New Metrics
+        if (document.getElementById('chip-val-loft')) {
+            document.getElementById('chip-val-loft').textContent = res.launchAngleDeg.toFixed(1);
+        }
+        if (document.getElementById('chip-val-spin')) {
+            document.getElementById('chip-val-spin').textContent = Math.round(res.spinRpm);
+        }
     }
 }

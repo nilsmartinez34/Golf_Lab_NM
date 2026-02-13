@@ -1537,3 +1537,88 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
         /* 9px */
     }
 }
+
+/* CHIP MODE SPECIFIC */
+#chip-footer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    padding: 8px 12px;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+.chip-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+}
+
+.chip-config-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.chip-item {
+    flex: 1;
+}
+
+.club-dropdown {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+.stance-selector {
+    display: flex;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    padding: 2px;
+}
+
+.stance-opt {
+    flex: 1;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.stance-opt.active {
+    background: var(--accent);
+    color: #000;
+}
+
+.chip-slider-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.green-conf {
+    min-width: 60px;
+}
+
+.green-btn {
+    width: 100%;
+    font-size: 10px;
+    padding: 6px 0;
+    background: #166534;
+    color: #FFF;
+    border: none;
+    border-radius: 4px;
+    font-weight: 700;
+    cursor: pointer;
+}

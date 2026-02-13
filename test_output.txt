@@ -1,0 +1,12 @@
+=== RUNNING CHIPPING PHYSICS TESTS ===
+[PASS] Should detect ground impact (Z <= 0)
+   Slow Roll: 33.5m, Fast Roll: 79.2m
+[PASS] Should roll further on fast greens
+   Ratio LW (Carry%): 39%, Ratio 7i (Carry%): 21%
+[PASS] Should have roll/flight ratio consistent with club selection
+   Putt Carry: 0.2m, Total: 8m
+[PASS] Should support Putter chipping (Texas Wedge)
+   No Wind Carry: 17m, Headwind Carry: 17m
+[FAIL] Reynolds: Wind should affect chips even at low speed
+Headwind must reduce chip carry
+[PASS] Ball Position should modify launch angle
