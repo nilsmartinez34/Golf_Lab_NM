@@ -1,0 +1,98 @@
+<div class="metric-container" id="swing-metrics-header">
+    <div class="metric-group">
+        <div class="metric-item">
+            <span class="label">CARRY</span>
+            <div class="value-group"><span id="val-m1">--</span><span class="unit">M</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">TOTAL</span>
+            <div class="value-group"><span id="val-m2">--</span><span class="unit">M</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">BACKSPIN</span>
+            <div class="value-group"><span id="val-spin-back">--</span><span class="unit">RPM</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">SIDESPIN</span>
+            <div class="value-group"><span id="val-spin-side">--</span><span class="unit">RPM</span></div>
+        </div>
+    </div>
+    <div class="metric-group">
+        <div class="metric-item">
+            <span class="label">SMASH</span>
+            <div class="value-group"><span id="val-smash">--</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">SIDE</span>
+            <div class="value-group"><span id="val-m3">--</span><span class="unit" id="unit-m3">R</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div id="swing-content">
+    <div class="hud bottom-left" id="hud-swing-left">
+        <span class="hud-title">SPEED</span>
+        <div class="hud-item"><span class="hud-label">CLUB</span><span class="hud-value"
+                id="hud-club-speed">--</span><span class="hud-unit">MPH</span></div>
+        <div class="hud-item"><span class="hud-label">BALL</span><span class="hud-value"
+                id="hud-ball-speed">--</span><span class="hud-unit">MPH</span></div>
+    </div>
+    <div class="hud bottom-right" id="hud-swing-right">
+        <span class="hud-title">IMPACT</span>
+        <div class="hud-item"><span class="hud-label">PATH ANGLE</span><span class="hud-value" id="hud-path">--</span>
+        </div>
+        <div class="hud-item"><span class="hud-label">FACE TO PATH</span><span class="hud-value" id="hud-face">--</span>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div id="swing-footer" class="footer-segment">
+    <div class="swing-dashboard-compact">
+        <div class="control-item speed-h">
+            <span class="ctrl-label-mini">SPEED</span>
+            <div class="h-slider-container">
+                <input type="range" id="input-power" min="10" max="150" value="90" class="h-slider-input speed-slider">
+                <div id="speed-fill-h" class="speed-gauge-fill-h"></div>
+            </div>
+            <span id="speed-label" class="ctrl-value-mini">90 MPH</span>
+        </div>
+        <div class="h-controls-compact">
+            <div class="control-item h-item-compact">
+                <span class="ctrl-label-mini">PATH</span>
+                <div class="angle-adjust-group">
+                    <div class="angle-buttons-vertical">
+                        <button class="angle-btn" id="btn-path-plus">+</button>
+                        <button class="angle-btn" id="btn-path-minus">−</button>
+                    </div>
+                    <span id="path-label" class="angle-value">0°</span>
+                </div>
+            </div>
+            <div class="control-item h-item-compact">
+                <span class="ctrl-label-mini">FACE</span>
+                <div class="angle-adjust-group">
+                    <div class="angle-buttons-vertical">
+                        <button class="angle-btn" id="btn-face-plus">+</button>
+                        <button class="angle-btn" id="btn-face-minus">−</button>
+                    </div>
+                    <span id="face-angle-label" class="angle-value">0°</span>
+                </div>
+            </div>
+            <div class="control-item h-item-compact">
+                <span class="ctrl-label-mini">ATTACK</span>
+                <div class="angle-adjust-group">
+                    <div class="angle-buttons-vertical">
+                        <button class="angle-btn" id="btn-attack-plus">+</button>
+                        <button class="angle-btn" id="btn-attack-minus">−</button>
+                    </div>
+                    <span id="attack-label" class="angle-value">0°</span>
+                </div>
+            </div>
+            <button class="action-btn-punchy-compact" id="btnSwing">SWING</button>
+        </div>
+    </div>
+    <div class="club-belt-container">
+        <div class="club-belt" id="club-belt"></div>
+    </div>
+</div>

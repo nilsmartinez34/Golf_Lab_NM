@@ -4,18 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Golf Lab NM</title>
+    <title>Golf Lab NM - Modular</title>
 
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-
-    <!-- iOS Specific Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Golf Lab">
     <link rel="apple-touch-icon" href="ico.png">
-
-    <!-- Theme Color -->
     <meta name="theme-color" content="#4ADE80">
 
     <link rel="stylesheet" href="style.css">
@@ -33,170 +28,20 @@
             <button class="tab-link" id="tab-putt">PUTT</button>
         </nav>
 
-        <!-- ZONE 1: TOP METRICS (Dynamic based on tab) -->
+        <!-- ZONE 1: TOP METRICS (Injected) -->
         <header class="top-metrics" id="main-metrics">
-            <div class="metric-container" id="swing-metrics-header">
-                <div class="metric-group">
-                    <div class="metric-item">
-                        <span class="label">CARRY</span>
-                        <div class="value-group"><span id="val-m1">--</span><span class="unit">M</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="label">TOTAL</span>
-                        <div class="value-group"><span id="val-m2">--</span><span class="unit">M</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="label">BACKSPIN</span>
-                        <div class="value-group"><span id="val-spin-back">--</span><span class="unit">RPM</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="label">SIDESPIN</span>
-                        <div class="value-group"><span id="val-spin-side">--</span><span class="unit">RPM</span></div>
-                    </div>
-                </div>
-                <div class="metric-group">
-                    <div class="metric-item">
-                        <span class="label">SMASH</span>
-                        <div class="value-group"><span id="val-smash">--</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="label">SIDE</span>
-                        <div class="value-group"><span id="val-m3">--</span><span class="unit" id="unit-m3">R</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="metric-container" id="chip-metrics-header" style="display: none;">
-                <div class="metric-group">
-                    <div class="metric-item">
-                        <span class="label">CARRY</span>
-                        <div class="value-group"><span id="chip-val-carry">--</span><span class="unit">M</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="label">ROLL</span>
-                        <div class="value-group"><span id="chip-val-roll">--</span><span class="unit">M</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="label">TOTAL</span>
-                        <div class="value-group"><span id="chip-val-total">--</span><span class="unit">M</span></div>
-                    </div>
-                </div>
-                <div class="metric-group">
-                    <div class="metric-item">
-                        <span class="label">APEX</span>
-                        <div class="value-group"><span id="chip-val-apex">--</span><span class="unit">M</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="label">RATIO</span>
-                        <div class="value-group"><span id="chip-val-ratio">--</span><span class="unit">%</span></div>
-                    </div>
-                </div>
-                <div class="metric-group">
-                    <div class="metric-item">
-                        <span class="label">DYN LOFT</span>
-                        <div class="value-group"><span id="chip-val-loft">--</span><span class="unit">°</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="label">SPIN</span>
-                        <div class="value-group"><span id="chip-val-spin">--</span><span class="unit">RPM</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="metric-container" id="putt-metrics-header" style="display: none;">
-                <div class="metric-grid-top">
-                    <div class="metric-item">
-                        <span class="label">AIM</span>
-                        <div class="value-group"><span id="putt-val-aim">0,00</span><span class="unit"
-                                id="putt-unit-aim">m LEFT</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <span class="label">PLAY AS</span>
-                        <div class="value-group"><span id="putt-val-playas">0,00</span><span class="unit">m
-                                EFFORT</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="metric-item full-width">
-                    <span class="label">APEX</span>
-                    <div class="value-group"><span id="putt-val-apex">0,00 / 0,00</span><span class="unit">X / Y</span>
-                    </div>
-                </div>
-            </div>
+            <!-- Fragments injected here -->
         </header>
 
         <!-- ZONE 2: GAMEPLAY -->
         <main class="gameplay-zone">
-            <!-- COMMON CANVAS (Displays differ based on mode) -->
             <canvas id="golfCanvas"></canvas>
 
-            <!-- SWING OVERLAYS -->
-            <div id="swing-content">
-                <div class="hud bottom-left" id="hud-swing-left">
-                    <span class="hud-title">SPEED</span>
-                    <div class="hud-item"><span class="hud-label">CLUB</span><span class="hud-value"
-                            id="hud-club-speed">--</span><span class="hud-unit">MPH</span></div>
-                    <div class="hud-item"><span class="hud-label">BALL</span><span class="hud-value"
-                            id="hud-ball-speed">--</span><span class="hud-unit">MPH</span></div>
-                </div>
-                <div class="hud bottom-right" id="hud-swing-right">
-                    <span class="hud-title">IMPACT</span>
-                    <div class="hud-item"><span class="hud-label">PATH ANGLE</span><span class="hud-value"
-                            id="hud-path">--</span></div>
-                    <div class="hud-item"><span class="hud-label">FACE TO PATH</span><span class="hud-value"
-                            id="hud-face">--</span></div>
-                </div>
-
-                <div class="overlay school-controls">
-                    <!-- This div is now empty after moving its contents to the footer -->
-                </div>
+            <div id="mode-content">
+                <!-- Fragments injected here -->
             </div>
 
-            <!-- CHIP OVERLAYS -->
-            <div id="chip-content" style="display: none;">
-                <!-- Reusing Canvas, maybe specific HUDs later -->
-                <div class="hud bottom-right">
-                    <span class="hud-title">CHIP CONFIG</span>
-                    <div class="hud-item"><span class="hud-label">SPEED</span><span class="hud-value"
-                            id="chip-speed-label">20 MPH</span></div>
-                </div>
-            </div>
-
-            <!-- PUTT OVERLAYS -->
-            <div id="putt-content" style="display: none;">
-                <!-- Top Buttons -->
-                <button class="circle-btn back-btn" id="btnPuttBack">←</button>
-                <div class="putt-actions-top">
-                    <button class="circle-btn status-btn active">✓</button>
-                    <button class="circle-btn menu-btn">☰</button>
-                </div>
-
-                <!-- Labels -->
-                <div class="putt-sub-overlay">
-                    <span class="overlay-label top-left">AIM POINT</span>
-                    <span class="overlay-label top-right">HISTORY</span>
-                </div>
-
-                <!-- Slope Controls -->
-                <div class="side-control left">
-                    <span class="side-label">SLOPE Y</span>
-                    <button class="adjust-btn" id="btn-slope-y-plus">+</button>
-                    <span class="side-value" id="val-slope-y">0,00°</span>
-                    <button class="adjust-btn" id="btn-slope-y-minus">-</button>
-                </div>
-
-                <div class="side-control right">
-                    <span class="side-label">SLOPE X</span>
-                    <button class="adjust-btn" id="btn-slope-x-plus">+</button>
-                    <span class="side-value" id="val-slope-x">3,00°</span>
-                    <button class="adjust-btn" id="btn-slope-x-minus">-</button>
-                </div>
-
-                <!-- Bottom Part is handled by footer -->
-            </div>
-
-            <!-- Weather HUD (Bottom Right) -->
+            <!-- Weather HUD (Constant) -->
             <div class="weather-hud" id="weather-hud">
                 <div class="wind-indicator">
                     <div class="wind-arrow" id="wind-arrow">↑</div>
@@ -209,173 +54,25 @@
         </main>
 
         <!-- ZONE 3: FOOTER CONTROLS -->
-        <footer class="bottom-controls">
-            <div id="swing-footer" class="footer-segment">
-                <div class="swing-dashboard-compact">
-                    <!-- Horizontal Speed Control -->
-                    <div class="control-item speed-h">
-                        <span class="ctrl-label-mini">SPEED</span>
-                        <div class="h-slider-container">
-                            <input type="range" id="input-power" min="10" max="150" value="90"
-                                class="h-slider-input speed-slider">
-                            <div id="speed-fill-h" class="speed-gauge-fill-h"></div>
-                        </div>
-                        <span id="speed-label" class="ctrl-value-mini">90 MPH</span>
-                    </div>
-
-                    <!-- Horizontal Controls Area -->
-                    <div class="h-controls-compact">
-                        <div class="control-item h-item-compact">
-                            <span class="ctrl-label-mini">PATH</span>
-                            <div class="angle-adjust-group">
-                                <div class="angle-buttons-vertical">
-                                    <button class="angle-btn" id="btn-path-plus">+</button>
-                                    <button class="angle-btn" id="btn-path-minus">−</button>
-                                </div>
-                                <span id="path-label" class="angle-value">0°</span>
-                            </div>
-                        </div>
-                        <div class="control-item h-item-compact">
-                            <span class="ctrl-label-mini">FACE</span>
-                            <div class="angle-adjust-group">
-                                <div class="angle-buttons-vertical">
-                                    <button class="angle-btn" id="btn-face-plus">+</button>
-                                    <button class="angle-btn" id="btn-face-minus">−</button>
-                                </div>
-                                <span id="face-angle-label" class="angle-value">0°</span>
-                            </div>
-                        </div>
-                        <div class="control-item h-item-compact">
-                            <span class="ctrl-label-mini">ATTACK</span>
-                            <div class="angle-adjust-group">
-                                <div class="angle-buttons-vertical">
-                                    <button class="angle-btn" id="btn-attack-plus">+</button>
-                                    <button class="angle-btn" id="btn-attack-minus">−</button>
-                                </div>
-                                <span id="attack-label" class="angle-value">0°</span>
-                            </div>
-                        </div>
-                        <button class="action-btn-punchy-compact" id="btnSwing">SWING</button>
-                    </div>
-                </div>
-
-                <div class="club-belt-container">
-                    <div class="club-belt" id="club-belt"></div>
-                </div>
-            </div>
-
-            <div id="chip-footer" class="footer-segment" style="display: none;">
-                <div class="chip-dashboard">
-                    <div class="chip-config-group">
-                        <div class="chip-item">
-                            <select id="chip-club-select" class="club-dropdown"></select>
-                        </div>
-                        <div class="chip-item">
-                            <div class="control-item h-item-compact" style="margin-bottom:0;">
-                                <span class="ctrl-label-mini">BALL POS</span>
-                                <div class="angle-adjust-group">
-                                    <button class="adjust-btn-small" id="btn-pos-minus">-</button>
-                                    <span id="val-ball-pos" class="angle-value" style="min-width:40px">0 cm</span>
-                                    <button class="adjust-btn-small" id="btn-pos-plus">+</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chip-slider-group">
-                        <input type="range" id="chip-input-power" min="5" max="60" value="20" class="h-slider-input"
-                            style="width:100%">
-                        <div class="green-conf">
-                            <button class="green-btn" id="btn-green-speed">GRN 10</button>
-                        </div>
-                    </div>
-                    <button class="action-btn-putt-rect" id="btnChip">CHIP</button>
-                </div>
-            </div>
-            <div id="putt-footer" class="footer-segment" style="display: none;">
-                <div class="putt-dashboard-horizontal">
-                    <button class="footer-btn reset-btn-circle" id="btnResetPutt" title="Reset">↺</button>
-
-                    <div class="target-control-center">
-                        <span class="target-label-mini">TARGET DISTANCE</span>
-                        <div class="distance-adjust-group">
-                            <button class="adjust-btn-small" id="btn-dist-minus">-</button>
-                            <span class="target-value" id="label-putt-dist">5,00m</span>
-                            <button class="adjust-btn-small" id="btn-dist-plus">+</button>
-                        </div>
-                    </div>
-
-                    <button class="footer-btn action-btn-putt-rect" id="btnPutt">PUTT</button>
-                </div>
-            </div>
+        <footer class="bottom-controls" id="main-footer">
+            <!-- Fragments injected here -->
         </footer>
     </div>
 
-    <!-- Modals -->
-    <div class="modal" id="settings-modal" style="display: none;">
-        <div class="modal-content">
-            <h3>SIMULATOR SETTINGS</h3>
-            <div class="setting-group">
-                <label>SPEED BOOST</label>
-                <input type="range" id="slider-speed-boost" min="0.5" max="2.0" step="0.1" value="1.0">
-                <span id="val-speed-boost">x1.0</span>
-            </div>
-            <div class="setting-group">
-                <label>ANGLE TOLERANCE</label>
-                <input type="range" id="slider-angle-limit" min="2" max="25" step="1" value="10">
-                <span id="val-angle-limit">10°</span>
-            </div>
+    <!-- Modals (Injected) -->
+    <div id="modal-container"></div>
 
-            <h4 style="margin: 1.25rem 0 0.625rem 0; color: var(--accent); font-size: 0.75rem; letter-spacing: 1px;">
-                WEATHER & ATMOSPHERE</h4>
+    <!-- Core Scripts -->
+    <script src="js/physics_ultimate.js?v=3"></script>
+    <script src="js/ui_manager.js?v=3"></script>
 
-            <div class="setting-group">
-                <label>ALTITUDE (m)</label>
-                <input type="range" id="slider-altitude" min="0" max="5000" step="50" value="0">
-                <span id="val-altitude">0m</span>
-            </div>
-            <div class="setting-group">
-                <label>TEMP (°C)</label>
-                <input type="range" id="slider-temp" min="-10" max="50" step="1" value="20">
-                <span id="val-temp">20°C</span>
-            </div>
-            <div class="setting-group">
-                <label>WIND SPEED (km/h)</label>
-                <input type="range" id="slider-wind-speed" min="0" max="100" step="1" value="0">
-                <span id="val-wind-speed">0 km/h</span>
-            </div>
-            <div class="setting-group">
-                <label>WIND DIR (°)</label>
-                <input type="range" id="slider-wind-dir" min="0" max="359" step="1" value="0">
-                <span id="val-wind-dir">0° (Tail)</span>
-            </div>
+    <!-- Mode Logic Scripts -->
+    <script src="js/swing_logic.js?v=3"></script>
+    <script src="js/chip_logic.js?v=3"></script>
+    <script src="js/putt_logic.js?v=3"></script>
 
-            <button class="close-btn" id="btnCloseSettings">CLOSE</button>
-        </div>
-    </div>
-
-    <div class="modal" id="history-modal" style="display: none;">
-        <div class="modal-content history-content">
-            <h3>SHOT HISTORY</h3>
-            <div id="history-list" class="history-scroll-area">
-                <!-- History items injected here -->
-            </div>
-            <button class="close-btn" id="btnCloseHistory">CLOSE</button>
-        </div>
-    </div>
-
-    <script src="physics_ultimate.js?v=2"></script>
-    <script src="app.js?v=2"></script>
-
-    <!-- Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registered:', reg))
-                    .catch(err => console.log('Service Worker registration failed:', err));
-            });
-        }
-    </script>
+    <!-- App Entry Point -->
+    <script src="app.js?v=3"></script>
 </body>
 
 </html>

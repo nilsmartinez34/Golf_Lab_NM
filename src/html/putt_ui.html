@@ -1,0 +1,58 @@
+<div class="metric-container" id="putt-metrics-header">
+    <div class="metric-grid-top">
+        <div class="metric-item">
+            <span class="label">AIM</span>
+            <div class="value-group"><span id="putt-val-aim">0,00</span><span class="unit" id="putt-unit-aim">m
+                    LEFT</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">PLAY AS</span>
+            <div class="value-group"><span id="putt-val-playas">0,00</span><span class="unit">m EFFORT</span></div>
+        </div>
+    </div>
+    <div class="metric-item full-width">
+        <span class="label">APEX</span>
+        <div class="value-group"><span id="putt-val-apex">0,00 / 0,00</span><span class="unit">X / Y</span></div>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div id="putt-content">
+    <button class="circle-btn back-btn" id="btnPuttBack">←</button>
+    <div class="putt-actions-top">
+        <button class="circle-btn status-btn active">✓</button>
+        <button class="circle-btn menu-btn">☰</button>
+    </div>
+    <div class="putt-sub-overlay">
+        <span class="overlay-label top-left">AIM POINT</span>
+        <span class="overlay-label top-right">HISTORY</span>
+    </div>
+    <div class="side-control left">
+        <span class="side-label">SLOPE Y</span>
+        <button class="adjust-btn" id="btn-slope-y-plus">+</button>
+        <span class="side-value" id="val-slope-y">0,00°</span>
+        <button class="adjust-btn" id="btn-slope-y-minus">-</button>
+    </div>
+    <div class="side-control right">
+        <span class="side-label">SLOPE X</span>
+        <button class="adjust-btn" id="btn-slope-x-plus">+</button>
+        <span class="side-value" id="val-slope-x">3,00°</span>
+        <button class="adjust-btn" id="btn-slope-x-minus">-</button>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div id="putt-footer" class="footer-segment">
+    <div class="putt-dashboard-horizontal">
+        <button class="footer-btn reset-btn-circle" id="btnResetPutt" title="Reset">↺</button>
+        <div class="target-control-center">
+            <span class="target-label-mini">TARGET DISTANCE</span>
+            <div class="distance-adjust-group">
+                <button class="adjust-btn-small" id="btn-dist-minus">-</button>
+                <span class="target-value" id="label-putt-dist">5,00m</span>
+                <button class="adjust-btn-small" id="btn-dist-plus">+</button>
+            </div>
+        </div>
+        <button class="footer-btn action-btn-putt-rect" id="btnPutt">PUTT</button>
+    </div>
+</div>

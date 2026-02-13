@@ -1,0 +1,51 @@
+<div class="modal" id="settings-modal" style="display: none;">
+    <div class="modal-content">
+        <h3>SIMULATOR SETTINGS</h3>
+        <div class="setting-group">
+            <label>SPEED BOOST</label>
+            <input type="range" id="slider-speed-boost" min="0.5" max="2.0" step="0.1" value="1.0">
+            <span id="val-speed-boost">x1.0</span>
+        </div>
+        <div class="setting-group">
+            <label>ANGLE TOLERANCE</label>
+            <input type="range" id="slider-angle-limit" min="2" max="25" step="1" value="10">
+            <span id="val-angle-limit">10°</span>
+        </div>
+
+        <h4 style="margin: 1.25rem 0 0.625rem 0; color: var(--accent); font-size: 0.75rem; letter-spacing: 1px;">WEATHER
+            & ATMOSPHERE</h4>
+
+        <div class="setting-group">
+            <label>ALTITUDE (m)</label>
+            <input type="range" id="slider-altitude" min="0" max="5000" step="50" value="0">
+            <span id="val-altitude">0m</span>
+        </div>
+        <div class="setting-group">
+            <label>TEMP (°C)</label>
+            <input type="range" id="slider-temp" min="-10" max="50" step="1" value="20">
+            <span id="val-temp">20°C</span>
+        </div>
+        <div class="setting-group">
+            <label>WIND SPEED (km/h)</label>
+            <input type="range" id="slider-wind-speed" min="0" max="100" step="1" value="0">
+            <span id="val-wind-speed">0 km/h</span>
+        </div>
+        <div class="setting-group">
+            <label>WIND DIR (°)</label>
+            <input type="range" id="slider-wind-dir" min="0" max="359" step="1" value="0">
+            <span id="val-wind-dir">0° (Tail)</span>
+        </div>
+
+        <button class="close-btn" id="btnCloseSettings">CLOSE</button>
+    </div>
+</div>
+
+<div class="modal" id="history-modal" style="display: none;">
+    <div class="modal-content history-content">
+        <h3>SHOT HISTORY</h3>
+        <div id="history-list" class="history-scroll-area">
+            <!-- History items injected here -->
+        </div>
+        <button class="close-btn" id="btnCloseHistory">CLOSE</button>
+    </div>
+</div>

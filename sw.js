@@ -1,10 +1,18 @@
-const CACHE_NAME = 'golf-lab-v2';
+const CACHE_NAME = 'golf-lab-v3';
 const urlsToCache = [
     './',
     './index.html',
     './style.css',
     './app.js',
-    './physics.js',
+    './js/physics_ultimate.js',
+    './js/ui_manager.js',
+    './js/swing_logic.js',
+    './js/chip_logic.js',
+    './js/putt_logic.js',
+    './src/html/swing_ui.html',
+    './src/html/chip_ui.html',
+    './src/html/putt_ui.html',
+    './components/modals.html',
     './manifest.json',
     'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap'
 ];

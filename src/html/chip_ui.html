@@ -1,0 +1,74 @@
+<div class="metric-container" id="chip-metrics-header">
+    <div class="metric-group">
+        <div class="metric-item">
+            <span class="label">CARRY</span>
+            <div class="value-group"><span id="chip-val-carry">--</span><span class="unit">M</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">ROLL</span>
+            <div class="value-group"><span id="chip-val-roll">--</span><span class="unit">M</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">TOTAL</span>
+            <div class="value-group"><span id="chip-val-total">--</span><span class="unit">M</span></div>
+        </div>
+    </div>
+    <div class="metric-group">
+        <div class="metric-item">
+            <span class="label">APEX</span>
+            <div class="value-group"><span id="chip-val-apex">--</span><span class="unit">M</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">RATIO</span>
+            <div class="value-group"><span id="chip-val-ratio">--</span><span class="unit">%</span></div>
+        </div>
+    </div>
+    <div class="metric-group">
+        <div class="metric-item">
+            <span class="label">DYN LOFT</span>
+            <div class="value-group"><span id="chip-val-loft">--</span><span class="unit">°</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">SPIN</span>
+            <div class="value-group"><span id="chip-val-spin">--</span><span class="unit">RPM</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div id="chip-content">
+    <div class="hud bottom-right">
+        <span class="hud-title">CHIP CONFIG</span>
+        <div class="hud-item"><span class="hud-label">SPEED</span><span class="hud-value" id="chip-speed-label">20
+                MPH</span></div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div id="chip-footer" class="footer-segment">
+    <div class="chip-dashboard">
+        <div class="chip-config-group">
+            <div class="chip-item">
+                <select id="chip-club-select" class="club-dropdown"></select>
+            </div>
+            <div class="chip-item">
+                <div class="control-item h-item-compact" style="margin-bottom:0;">
+                    <span class="ctrl-label-mini">BALL POS</span>
+                    <div class="angle-adjust-group">
+                        <button class="adjust-btn-small" id="btn-pos-minus">-</button>
+                        <span id="val-ball-pos" class="angle-value" style="min-width:40px">0 cm</span>
+                        <button class="adjust-btn-small" id="btn-pos-plus">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chip-slider-group">
+            <input type="range" id="chip-input-power" min="5" max="30" value="20" class="h-slider-input"
+                style="width:100%">
+            <div class="green-conf">
+                <button class="green-btn" id="btn-green-speed">GRN 10</button>
+            </div>
+        </div>
+        <button class="action-btn-putt-rect" id="btnChip">CHIP</button>
+    </div>
+</div>

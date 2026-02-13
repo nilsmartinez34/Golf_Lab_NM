@@ -1,4 +1,4 @@
-const PhysicsEngine = require('../physics_ultimate.js');
+const PhysicsEngine = require('../js/physics_ultimate.js');
 const assert = require('assert');
 
 console.log("=== RUNNING CHIPPING PHYSICS TESTS ===");
