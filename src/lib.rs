@@ -68,7 +68,12 @@ impl PhysicsEngineRust {
         (pressure * m) / (r * temp_k)
     }
 
-    pub fn calculate_coefficients(speed: f64, current_rpm: f64) -> (f64, f64) {
+    pub fn calculate_coefficients(speed: f64, current_rpm: f64) -> JsValue {
+        let (cd, cl) = Self::calculate_coefficients_internal(speed, current_rpm);
+        serde_wasm_bindgen::to_value(&serde_json::json!({ "cd": cd, "cl": cl })).unwrap()
+    }
+
+    fn calculate_coefficients_internal(speed: f64, current_rpm: f64) -> (f64, f64) {
         let omega = current_rpm * 0.10471975512;
         let spin_ratio = (omega * BALL_RADIUS) / (speed + 0.1);
         let mut cd = 0.23 + (0.12 * spin_ratio);
@@ -82,7 +87,7 @@ impl PhysicsEngineRust {
     fn get_acceleration(vel: Vec3, spin_rate: f64, axis_tilt_rad: f64, wind_vel: Vec3, rho: f64) -> Vec3 {
         let v_rel = vel.sub(wind_vel);
         let speed = v_rel.mag();
-        let (cd, cl) = Self::calculate_coefficients(speed, spin_rate / 0.10471975512);
+        let (cd, cl) = Self::calculate_coefficients_internal(speed, spin_rate / 0.10471975512);
 
         let fd = v_rel.normalize().mult(-0.5 * rho * BALL_AREA * cd * speed * speed);
         let fg = Vec3::new(0.0, 0.0, -BALL_MASS * GRAVITY);
