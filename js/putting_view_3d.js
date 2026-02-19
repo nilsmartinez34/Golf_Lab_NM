@@ -73,12 +73,15 @@ class PuttingView3D {
         // Green (Plane)
         const greenGeo = new THREE.PlaneGeometry(50, 200);
         const greenMat = new THREE.MeshStandardMaterial({
+            color: 0x228B22, // Vert herbe de secours
             map: grassColor,
             normalMap: grassNormal,
-            roughnessMap: grassRough,
-            roughness: 0.8,
-            metalness: 0.05
+            normalScale: new THREE.Vector2(1.5, 1.5), // Augmente le relief
+            roughness: 0.8
         });
+
+
+
         this.green = new THREE.Mesh(greenGeo, greenMat);
         this.green.rotation.x = -Math.PI / 2;
         this.green.receiveShadow = true;
@@ -87,14 +90,23 @@ class PuttingView3D {
         // Ball (Sphere)
         const ballGeo = new THREE.SphereGeometry(0.02135, 32, 32);
         const ballMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff, // Blanc pur si la texture échoue
             map: ballTex,
-            roughness: 0.2,
-            metalness: 0.1
+            bumpMap: ballTex, // Utilise ton image golf_texture.jpg pour le relief
+            bumpScale: 0.005,
+            roughness: 0.2
         });
         this.ball = new THREE.Mesh(ballGeo, ballMat);
         this.ball.position.y = 0.02135;
         this.ball.castShadow = true;
         this.scene.add(this.ball);
+
+        const grid = new THREE.GridHelper(200, 100, 0xffffff, 0x222222);
+        grid.rotation.x = -Math.PI / 2;
+        grid.position.y = 0.001; // Juste au dessus du sol
+        grid.material.opacity = 0.2;
+        grid.material.transparent = true;
+        this.scene.add(grid);
 
         this.isInitialized = true;
         this.animate();
@@ -147,6 +159,10 @@ class PuttingView3D {
     setVisible(visible) {
         if (this.renderer) {
             this.renderer.domElement.style.display = visible ? 'block' : 'none';
+        }
+        if (this.container) {
+            this.container.style.display = visible ? 'block' : 'none';
+            this.container.style.pointerEvents = visible ? 'auto' : 'none';
         }
     }
 }
