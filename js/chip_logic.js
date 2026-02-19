@@ -72,6 +72,14 @@ window.calculateChip = function () {
 
     const result = PhysicsEngine.simulateChipping(params, appState.weather, greenSpeed);
     appState.trajectoryResult = result;
+
+    // --- DYNAMIC SCALING ---
+    // Rounds to the next 5m (min 20m for Dist, 10m for Height)
+    const next5 = (v) => Math.ceil(v / 5) * 5;
+    appState.chipBounds.maxDist = Math.max(20, next5(result.totalDistance));
+    appState.chipBounds.maxHeight = Math.max(10, next5(result.maxHeight));
+    // Keep minHeight at -10 to see ground/roll context
+
     animate(result);
     window.updateChipMetrics(result, params);
     addHistoryItem('Chip', result);

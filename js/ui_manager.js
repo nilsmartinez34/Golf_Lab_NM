@@ -33,7 +33,12 @@ window.appState = {
     },
 
     chipBallPos: 0,
-    chipGreenSpeed: 10
+    chipGreenSpeed: 10,
+    chipBounds: {
+        maxDist: 40,
+        maxHeight: 20,
+        minHeight: -10
+    }
 };
 
 const PIXELS_PER_METER = 50;
@@ -213,11 +218,8 @@ window.drawSwingGrid = function (ctx, canvas) {
 }
 
 window.drawChipProfile = function (ctx, canvas) {
-    // Visual bounds: X: 0-40m, Y: -10m to +20m
-    const maxDist = 40; // X-axis max
-    const minHeight = -10; // Y-axis min
-    const maxHeight = 20; // Y-axis max
-    const totalHeightRange = maxHeight - minHeight; // 30m total
+    const { maxDist, maxHeight, minHeight } = appState.chipBounds;
+    const totalHeightRange = maxHeight - minHeight;
 
     // Ground line at Y=0, positioned proportionally
     const groundY = canvas.height * (1 - (0 - minHeight) / totalHeightRange); // ~67% from top
@@ -344,10 +346,7 @@ window.drawPersistentTrajectory = function (ctx, canvas, result) {
 };
 
 window.drawPersistentChipProfile = function (ctx, canvas, result) {
-    // Match the new visual bounds
-    const maxDist = 40;
-    const minHeight = -10;
-    const maxHeight = 20;
+    const { maxDist, maxHeight, minHeight } = appState.chipBounds;
     const totalHeightRange = maxHeight - minHeight;
 
     const groundY = canvas.height * (1 - (0 - minHeight) / totalHeightRange);
@@ -410,7 +409,8 @@ window.animate = function (result) {
             ctx.fillStyle = 'white';
             ctx.beginPath(); ctx.arc(cx + p.x * PIXELS_PER_METER, cy - p.y * PIXELS_PER_METER, 5, 0, Math.PI * 2); ctx.fill();
         } else if (appState.mode === 'chip') {
-            const maxDist = 40, minH = -10, maxH = 20, totalH = maxH - minH;
+            const { maxDist, minHeight: minH, maxHeight: maxH } = appState.chipBounds;
+            const totalH = maxH - minH;
             const groundY = canvas.height * (1 - (0 - minH) / totalH);
             const pxPerM = canvas.width / maxDist, verticalPxPerM = canvas.height / totalH;
             const flightEnd = result.flightPathEndIndex || result.path.length;
