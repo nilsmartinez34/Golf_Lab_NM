@@ -1,0 +1,37 @@
+name: Rust WASM Build & Deploy
+on:
+  push:
+    branches: [ main ] # Se déclenche quand tu pousses sur la branche main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM (PRO Engine)
+        run: wasm-pack build --target web --out-dir pkg
+
+      - name: Verify WASM Generation
+        run: |
+          if [ ! -f "pkg/golf_physics_core_bg.wasm" ]; then
+            echo "Error: WASM file not found!"
+            exit 1
+          fi
+
+      - name: Commit and Push WASM files
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add pkg/
+          git commit -m "Automated WASM Build [skip ci]" || echo "No changes to commit"
+          git push
