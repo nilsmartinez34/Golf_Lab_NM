@@ -105,6 +105,29 @@ window.switchMode = async function (mode) {
 
         if (window.resizeCanvas) window.resizeCanvas();
 
+        // --- 3D VIEW INITIALIZATION ---
+        if (mode === 'putt' && window.puttingView3D) {
+            let container3d = document.getElementById('canvas-3d-container');
+            if (!container3d) {
+                container3d = document.createElement('div');
+                container3d.id = 'canvas-3d-container';
+                container3d.style.position = 'absolute';
+                container3d.style.top = '0';
+                container3d.style.left = '0';
+                container3d.style.width = '100%';
+                container3d.style.height = '100%';
+                container3d.style.zIndex = '5'; // Above 2D canvas, below UI
+                container3d.style.pointerEvents = 'none'; // Let UI clicks pass through
+                document.querySelector('.gameplay-zone').appendChild(container3d);
+            }
+            window.puttingView3D.init('canvas-3d-container');
+            window.puttingView3D.setVisible(true);
+            document.getElementById('golfCanvas').style.opacity = '0.1'; // Ghost the 2D grid
+        } else if (window.puttingView3D) {
+            window.puttingView3D.setVisible(false);
+            document.getElementById('golfCanvas').style.opacity = '1.0';
+        }
+
     } catch (error) {
         console.error(`ERROR in switchMode(${mode}):`, error);
     }

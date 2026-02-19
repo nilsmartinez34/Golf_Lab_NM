@@ -30,6 +30,9 @@ window.initPuttUI = function () {
     const bPutt = document.getElementById('btnPutt');
     if (bPutt) bPutt.onclick = () => {
         if (appState.trajectoryResult && appState.trajectoryResult.isPutt) {
+            if (window.puttingView3D && appState.mode === 'putt') {
+                window.puttingView3D.startPuttAnimation(appState.trajectoryResult);
+            }
             animate(appState.trajectoryResult);
         }
     };
