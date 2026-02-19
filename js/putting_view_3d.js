@@ -53,25 +53,31 @@ class PuttingView3D {
         dirLight.shadow.camera.bottom = -10;
         this.scene.add(dirLight);
 
-        // Procedural Grass Texture
-        const canvas = document.createElement('canvas');
-        canvas.width = 256; canvas.height = 256;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#15803D'; ctx.fillRect(0, 0, 256, 256);
-        for (let i = 0; i < 5000; i++) {
-            ctx.fillStyle = `rgba(20, 100, 40, ${0.1 + Math.random() * 0.2})`;
-            ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
-        }
-        const grassTex = new THREE.CanvasTexture(canvas);
-        grassTex.wrapS = grassTex.wrapT = THREE.RepeatWrapping;
-        grassTex.repeat.set(20, 80);
+        // Texture Loading
+        const loader = new THREE.TextureLoader();
+
+        // Grass Textures
+        const grassColor = loader.load('assets/textures/grass/Grass005_2K-JPG_Color.jpg');
+        const grassNormal = loader.load('assets/textures/grass/Grass005_2K-JPG_NormalGL.jpg');
+        const grassRough = loader.load('assets/textures/grass/Grass005_2K-JPG_Roughness.jpg');
+
+        [grassColor, grassNormal, grassRough].forEach(t => {
+            t.wrapS = t.wrapT = THREE.RepeatWrapping;
+            t.repeat.set(20, 80);
+        });
+
+        // Ball Texture
+        const ballTex = loader.load('assets/textures/golf_texture.jpg');
+        ballTex.anisotropy = 16;
 
         // Green (Plane)
         const greenGeo = new THREE.PlaneGeometry(50, 200);
         const greenMat = new THREE.MeshStandardMaterial({
-            map: grassTex,
-            roughness: 0.9,
-            metalness: 0.1
+            map: grassColor,
+            normalMap: grassNormal,
+            roughnessMap: grassRough,
+            roughness: 0.8,
+            metalness: 0.05
         });
         this.green = new THREE.Mesh(greenGeo, greenMat);
         this.green.rotation.x = -Math.PI / 2;
@@ -80,7 +86,11 @@ class PuttingView3D {
 
         // Ball (Sphere)
         const ballGeo = new THREE.SphereGeometry(0.02135, 32, 32);
-        const ballMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        const ballMat = new THREE.MeshStandardMaterial({
+            map: ballTex,
+            roughness: 0.2,
+            metalness: 0.1
+        });
         this.ball = new THREE.Mesh(ballGeo, ballMat);
         this.ball.position.y = 0.02135;
         this.ball.castShadow = true;
