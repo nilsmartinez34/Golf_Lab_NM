@@ -36,21 +36,26 @@ class PuttingView3D {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.0;
+        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.container.appendChild(this.renderer.domElement);
 
         // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
         this.scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        dirLight.position.set(2, 5, 2);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight.position.set(5, 10, 5);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 1024;
-        dirLight.shadow.mapSize.height = 1024;
-        dirLight.shadow.camera.left = -10;
-        dirLight.shadow.camera.right = 10;
-        dirLight.shadow.camera.top = 10;
-        dirLight.shadow.camera.bottom = -10;
+        dirLight.shadow.mapSize.width = 2048; // Higher resolution shadows
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.left = -20;
+        dirLight.shadow.camera.right = 20;
+        dirLight.shadow.camera.top = 20;
+        dirLight.shadow.camera.bottom = -20;
+        dirLight.shadow.bias = -0.0001;
         this.scene.add(dirLight);
 
         // Texture Loading
@@ -60,8 +65,9 @@ class PuttingView3D {
         const grassColor = loader.load('assets/textures/grass/Grass005_2K-JPG_Color.jpg');
         const grassNormal = loader.load('assets/textures/grass/Grass005_2K-JPG_NormalGL.jpg');
         const grassRough = loader.load('assets/textures/grass/Grass005_2K-JPG_Roughness.jpg');
+        const grassAO = loader.load('assets/textures/grass/Grass005_2K-JPG_AmbientOcclusion.jpg');
 
-        [grassColor, grassNormal, grassRough].forEach(t => {
+        [grassColor, grassNormal, grassRough, grassAO].forEach(t => {
             t.wrapS = t.wrapT = THREE.RepeatWrapping;
             t.repeat.set(20, 80);
         });
@@ -73,11 +79,13 @@ class PuttingView3D {
         // Green (Plane)
         const greenGeo = new THREE.PlaneGeometry(50, 200);
         const greenMat = new THREE.MeshStandardMaterial({
-            color: 0x228B22, // Vert herbe de secours
             map: grassColor,
             normalMap: grassNormal,
-            normalScale: new THREE.Vector2(1.5, 1.5), // Augmente le relief
-            roughness: 0.8
+            normalScale: new THREE.Vector2(0.8, 0.8),
+            roughnessMap: grassRough,
+            aoMap: grassAO,
+            roughness: 1.0,
+            metalness: 0.0
         });
 
 
@@ -88,13 +96,14 @@ class PuttingView3D {
         this.scene.add(this.green);
 
         // Ball (Sphere)
-        const ballGeo = new THREE.SphereGeometry(0.02135, 32, 32);
+        const ballGeo = new THREE.SphereGeometry(0.02135, 64, 64); // Smoother sphere
         const ballMat = new THREE.MeshStandardMaterial({
-            color: 0xffffff, // Blanc pur si la texture échoue
+            color: 0xffffff,
             map: ballTex,
-            bumpMap: ballTex, // Utilise ton image golf_texture.jpg pour le relief
-            bumpScale: 0.005,
-            roughness: 0.2
+            roughness: 0.15, // Glossy finish for a golf ball
+            metalness: 0.0,
+            bumpMap: ballTex,
+            bumpScale: 0.002
         });
         this.ball = new THREE.Mesh(ballGeo, ballMat);
         this.ball.position.y = 0.02135;
@@ -107,6 +116,13 @@ class PuttingView3D {
         grid.material.opacity = 0.2;
         grid.material.transparent = true;
         this.scene.add(grid);
+
+        // Env Map (Procedural PBR)
+        const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+        pmremGenerator.compileEquirectangularShader();
+
+        // Use the background as a base for environment
+        this.scene.environment = pmremGenerator.fromScene(new THREE.Scene()).texture;
 
         this.isInitialized = true;
         this.animate();
