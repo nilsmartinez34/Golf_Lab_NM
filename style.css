@@ -1624,21 +1624,36 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     cursor: pointer;
 }
 
-/* Bouton Flottant (FAB) */
+/* Bouton Flottant Mémo (FAB) - Aligné sur weather-hud */
 .memo-fab {
     position: absolute;
-    bottom: 80px;
-    right: 15px;
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid #4ADE80;
-    color: #4ADE80;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 10px;
+    bottom: 5.5rem;
+    /* Stacks above weather-hud */
+    right: 1.25rem;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    color: var(--accent);
+    font-size: 0.6875rem;
+    /* 11px */
     font-weight: 900;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     z-index: 100;
-    backdrop-filter: blur(4px);
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.memo-fab:hover {
+    background: rgba(15, 23, 42, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 10px rgba(74, 222, 128, 0.1);
+}
+
+.memo-fab:active {
+    transform: translateY(0);
 }
 
 /* Style de la modale Mémo */
@@ -1683,5 +1698,20 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     display: inline-block;
     height: 4px;
     background: #4ADE80;
+    border-radius: 2px;
+}
+
+.memo-scroll-area {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.memo-scroll-area::-webkit-scrollbar {
+    width: 4px;
+}
+
+.memo-scroll-area::-webkit-scrollbar-thumb {
+    background: rgba(74, 222, 128, 0.3);
     border-radius: 2px;
 }
