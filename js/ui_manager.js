@@ -43,15 +43,21 @@ window.appState = {
 
 const PIXELS_PER_METER = 50;
 
-function chipSpeedToColor(speed, maxSpeed) {
+/**
+ * INTERPOLATE COLOR BASED ON SPEED
+ * Returns a color between Green (slow) and Red (fast).
+ * @param {number} speed Current speed
+ * @param {number} maxSpeed Max speed for normalization
+ */
+function getSpeedColor(speed, maxSpeed) {
     if (!maxSpeed || maxSpeed <= 0) {
         return 'rgba(255,255,255,1)'; // Fallback: white
     }
     const ratio = Math.max(0, Math.min(1, speed / maxSpeed));
-    // Interpolate between white (0) and a bright green (max)
-    const r = Math.round(255 + (34 - 255) * ratio);  // 255 -> 34
-    const g = Math.round(255 + (197 - 255) * ratio); // 255 -> 197
-    const b = Math.round(255 + (94 - 255) * ratio);  // 255 -> 94
+    // Green (0, 255, 0) to Red (255, 0, 0)
+    const r = Math.round(255 * ratio);
+    const g = Math.round(255 * (1 - ratio));
+    const b = 0;
     return `rgba(${r},${g},${b},1)`;
 }
 
@@ -293,8 +299,11 @@ window.drawPuttGrid = function (ctx, canvas) {
     const cy = canvas.height - 100;
     const gridStep = 0.5 * PIXELS_PER_METER;
 
-    ctx.strokeStyle = 'rgba(74, 222, 128, 0.1)';
+    ctx.strokeStyle = 'rgba(74, 222, 128, 0.15)';
     ctx.lineWidth = 1;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.font = '10px Inter';
+    ctx.textAlign = 'left';
 
     for (let x = cx; x < canvas.width; x += gridStep) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
@@ -302,11 +311,13 @@ window.drawPuttGrid = function (ctx, canvas) {
     for (let x = cx - gridStep; x > 0; x -= gridStep) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
     }
-    for (let y = cy; y < canvas.height; y += gridStep) {
+    for (let y = cy, d = 0; y < canvas.height; y += gridStep, d += 0.5) {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        if (d > 0 && Number.isInteger(d)) ctx.fillText(`${d}m`, cx + 5, y - 2);
     }
-    for (let y = cy - gridStep; y > 0; y -= gridStep) {
+    for (let y = cy - gridStep, d = 0.5; y > 0; y -= gridStep, d += 0.5) {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        if (Number.isInteger(d)) ctx.fillText(`${d}m`, cx + 5, y - 2);
     }
 
     ctx.fillStyle = 'white';
@@ -332,25 +343,55 @@ window.drawPuttGrid = function (ctx, canvas) {
 window.drawPersistentSwingTrajectory = function (ctx, canvas, result) {
     if (!result.path || result.isPutt) return;
     const hY = canvas.height * 0.38, gY = canvas.height * 0.88, gR = gY - hY, k = 0.0052, VIEW_SCALE = 20.0;
-    ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)'; ctx.lineWidth = 2;
-    result.path.forEach((p, i) => {
-        const sc = Math.exp(-k * p.x);
-        const sx = (canvas.width * 0.5) + (p.y * sc * VIEW_SCALE);
-        const sy = (hY + (gR * sc)) - (p.z * sc * VIEW_SCALE);
-        if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
-    });
-    ctx.stroke();
+    const flightEnd = result.flightPathEndIndex || result.path.length;
+
+    let maxSpeed = 0;
+    result.path.forEach(p => { if (p.speed > maxSpeed) maxSpeed = p.speed; });
+
+    ctx.lineWidth = 2;
+    for (let i = 1; i < result.path.length; i++) {
+        const p0 = result.path[i - 1];
+        const p1 = result.path[i];
+        const sc0 = Math.exp(-k * p0.x), sc1 = Math.exp(-k * p1.x);
+        const sx0 = (canvas.width * 0.5) + (p0.y * sc0 * VIEW_SCALE);
+        const sy0 = (hY + (gR * sc0)) - (p0.z * sc0 * VIEW_SCALE);
+        const sx1 = (canvas.width * 0.5) + (p1.y * sc1 * VIEW_SCALE);
+        const sy1 = (hY + (gR * sc1)) - (p1.z * sc1 * VIEW_SCALE);
+
+        if (i <= flightEnd) {
+            ctx.strokeStyle = getSpeedColor(p1.speed || 0, maxSpeed);
+        } else {
+            ctx.strokeStyle = '#FACC15'; // Roll
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(sx0, sy0);
+        ctx.lineTo(sx1, sy1);
+        ctx.stroke();
+    }
 };
 
 window.drawPersistentTrajectory = function (ctx, canvas, result) {
     if (!result.isPutt) return;
     const cx = canvas.width / 2, cy = canvas.height - 100;
-    ctx.beginPath(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.lineWidth = 2;
-    result.path.forEach((p, i) => {
-        const px = cx + p.x * PIXELS_PER_METER, py = cy - p.y * PIXELS_PER_METER;
-        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-    });
-    ctx.stroke();
+
+    let maxSpeed = 0;
+    result.path.forEach(p => { if (p.speed > maxSpeed) maxSpeed = p.speed; });
+
+    ctx.lineWidth = 2;
+    for (let i = 1; i < result.path.length; i++) {
+        const p0 = result.path[i - 1];
+        const p1 = result.path[i];
+        const px0 = cx + p0.x * PIXELS_PER_METER, py0 = cy - p0.y * PIXELS_PER_METER;
+        const px1 = cx + p1.x * PIXELS_PER_METER, py1 = cy - p1.y * PIXELS_PER_METER;
+
+        ctx.strokeStyle = getSpeedColor(p1.speed || 0, maxSpeed);
+        ctx.beginPath();
+        ctx.moveTo(px0, py0);
+        ctx.lineTo(px1, py1);
+        ctx.stroke();
+    }
+
     if (result.apexPoint) {
         const ax = cx + result.apexPoint.x * PIXELS_PER_METER, ay = cy - result.apexPoint.y * PIXELS_PER_METER;
         ctx.fillStyle = '#FACC15'; ctx.beginPath(); ctx.arc(ax, ay, 4, 0, Math.PI * 2); ctx.fill();
@@ -383,7 +424,7 @@ window.drawPersistentChipProfile = function (ctx, canvas, result) {
         const p1 = result.path[i];
         if (!p0 || !p1) continue;
         const speed = typeof p1.speed === 'number' ? p1.speed : 0;
-        ctx.strokeStyle = chipSpeedToColor(speed, maxSpeed);
+        ctx.strokeStyle = getSpeedColor(speed, maxSpeed);
         ctx.beginPath();
         const x0 = p0.x * pxPerM;
         const y0 = groundY - (p0.z * verticalPxPerM);
@@ -427,14 +468,24 @@ window.animate = function (result) {
         ctx.lineWidth = 2;
 
         if (isPutt) {
-            for (let i = 0; i <= frame; i++) {
-                const p = result.path[i];
-                ctx.lineTo(cx + p.x * PIXELS_PER_METER, cy - p.y * PIXELS_PER_METER);
+            let maxSpeed = 0;
+            result.path.forEach(p => { if (p.speed > maxSpeed) maxSpeed = p.speed; });
+
+            for (let i = 1; i <= frame && i < result.path.length; i++) {
+                const p0 = result.path[i - 1];
+                const p1 = result.path[i];
+                ctx.strokeStyle = getSpeedColor(p1.speed || 0, maxSpeed);
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(cx + p0.x * PIXELS_PER_METER, cy - p0.y * PIXELS_PER_METER);
+                ctx.lineTo(cx + p1.x * PIXELS_PER_METER, cy - p1.y * PIXELS_PER_METER);
+                ctx.stroke();
             }
-            ctx.stroke();
-            const p = result.path[frame];
-            ctx.fillStyle = 'white';
-            ctx.beginPath(); ctx.arc(cx + p.x * PIXELS_PER_METER, cy - p.y * PIXELS_PER_METER, 5, 0, Math.PI * 2); ctx.fill();
+            const currentP = result.path[frame];
+            if (currentP) {
+                ctx.fillStyle = 'white';
+                ctx.beginPath(); ctx.arc(cx + currentP.x * PIXELS_PER_METER, cy - currentP.y * PIXELS_PER_METER, 5, 0, Math.PI * 2); ctx.fill();
+            }
         } else if (appState.mode === 'chip') {
             const { maxDist, minHeight: minH, maxHeight: maxH } = appState.chipBounds;
             const totalH = maxH - minH;
@@ -443,52 +494,63 @@ window.animate = function (result) {
             const verticalPxPerM = canvas.height / totalH;
             const flightEnd = result.flightPathEndIndex || result.path.length;
 
-            // Compute max speed during flight for color normalization
             let maxSpeed = 0;
-            for (let i = 0; i < flightEnd; i++) {
-                const p = result.path[i];
-                if (p && typeof p.speed === 'number' && p.speed > maxSpeed) {
-                    maxSpeed = p.speed;
-                }
-            }
+            result.path.forEach(p => { if (p.speed > maxSpeed) maxSpeed = p.speed; });
 
-            // Draw up to current frame with speed-based color on flight, yellow on roll
             for (let i = 1; i <= frame && i < result.path.length; i++) {
                 const p0 = result.path[i - 1];
                 const p1 = result.path[i];
                 if (!p0 || !p1) continue;
 
-                const x0 = p0.x * pxPerM;
-                const y0 = groundY - (p0.z * verticalPxPerM);
-                const x1 = p1.x * pxPerM;
-                const y1 = groundY - (p1.z * verticalPxPerM);
-
                 if (i <= flightEnd) {
-                    const speed = typeof p1.speed === 'number' ? p1.speed : 0;
-                    ctx.strokeStyle = chipSpeedToColor(speed, maxSpeed);
+                    ctx.strokeStyle = getSpeedColor(p1.speed || 0, maxSpeed);
                 } else {
                     ctx.strokeStyle = '#FACC15';
                 }
 
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(p0.x * pxPerM, groundY - (p0.z * verticalPxPerM));
+                ctx.lineTo(p1.x * pxPerM, groundY - (p1.z * verticalPxPerM));
+                ctx.stroke();
+            }
+            const currentP = result.path[frame];
+            if (currentP) {
+                ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(currentP.x * pxPerM, groundY - (currentP.z * verticalPxPerM), 4, 0, Math.PI * 2); ctx.fill();
+            }
+        } else {
+            const hY = canvas.height * 0.38, gY = canvas.height * 0.88, gR = gY - hY, k = 0.0052, VS = 20.0, flightEnd = result.flightPathEndIndex || result.path.length;
+
+            let maxSpeed = 0;
+            result.path.forEach(p => { if (p.speed > maxSpeed) maxSpeed = p.speed; });
+
+            for (let i = 1; i <= frame && i < result.path.length; i++) {
+                const p0 = result.path[i - 1];
+                const p1 = result.path[i];
+                if (!p0 || !p1) continue;
+
+                const sc0 = Math.exp(-k * p0.x), sc1 = Math.exp(-k * p1.x);
+                const x0 = (canvas.width * 0.5) + (p0.y * sc0 * VS), y0 = (hY + (gR * sc0)) - (p0.z * sc0 * VS);
+                const x1 = (canvas.width * 0.5) + (p1.y * sc1 * VS), y1 = (hY + (gR * sc1)) - (p1.z * sc1 * VS);
+
+                if (i <= flightEnd) {
+                    ctx.strokeStyle = getSpeedColor(p1.speed || 0, maxSpeed);
+                } else {
+                    ctx.strokeStyle = '#FACC15';
+                }
+
+                ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.moveTo(x0, y0);
                 ctx.lineTo(x1, y1);
                 ctx.stroke();
             }
-            const p = result.path[frame];
-            ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(p.x * pxPerM, groundY - (p.z * verticalPxPerM), 4, 0, Math.PI * 2); ctx.fill();
-        } else {
-            const hY = canvas.height * 0.38, gY = canvas.height * 0.88, gR = gY - hY, k = 0.0052, VS = 20.0, flightEnd = result.flightPathEndIndex || result.path.length;
-            ctx.beginPath();
-            for (let i = 0; i <= frame; i++) {
-                const p = result.path[i], sc = Math.exp(-k * p.x), x = (canvas.width * 0.5) + (p.y * sc * VS), y = (hY + (gR * sc)) - (p.z * sc * VS);
-                if (i === flightEnd) { ctx.stroke(); ctx.beginPath(); ctx.strokeStyle = '#FACC15'; ctx.moveTo(x, y); }
-                else if (i === 0) { ctx.moveTo(x, y); ctx.strokeStyle = '#FFFFFF'; }
-                else ctx.lineTo(x, y);
+
+            const currentP = result.path[frame];
+            if (currentP) {
+                const sc = Math.exp(-k * currentP.x);
+                ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc((canvas.width * 0.5) + (currentP.y * sc * VS), (hY + (gR * sc)) - (currentP.z * sc * VS), Math.max(2, 6 * sc), 0, Math.PI * 2); ctx.fill();
             }
-            ctx.stroke();
-            const p = result.path[frame], sc = Math.exp(-k * p.x);
-            ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc((canvas.width * 0.5) + (p.y * sc * VS), (hY + (gR * sc)) - (p.z * sc * VS), Math.max(2, 6 * sc), 0, Math.PI * 2); ctx.fill();
         }
         frame += 2;
         requestAnimationFrame(step);

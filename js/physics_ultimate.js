@@ -470,7 +470,7 @@ class PhysicsEngine {
         const ay_slope = -CONSTANTS.GRAVITY * Math.sin(thetaY);
         let totalDistTraveled = 0.0;
         while (t < 10.0) {
-            path.push({ x, y, z: 0.0 });
+            path.push({ x, y, z: 0.0, t, speed: Math.sqrt(vx * vx + vy * vy) });
             const v = Math.sqrt(vx * vx + vy * vy);
             if (v < STOP_THRESHOLD && t > 0.1) break;
             const cosTheta = Math.cos(Math.sqrt(thetaX ** 2 + thetaY ** 2));

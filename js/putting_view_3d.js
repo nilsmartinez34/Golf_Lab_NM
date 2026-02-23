@@ -15,6 +15,8 @@ class PuttingView3D {
         this.isInitialized = false;
         this.animationData = null;
         this.frameIndex = 0;
+        this.tracer = null;
+        this.maxPoints = 1000;
     }
 
     init(containerId) {
@@ -124,6 +126,17 @@ class PuttingView3D {
         // Use the background as a base for environment
         this.scene.environment = pmremGenerator.fromScene(new THREE.Scene()).texture;
 
+        // Tracer initialization
+        const tracerGeo = new THREE.BufferGeometry();
+        tracerGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(this.maxPoints * 3), 3));
+        tracerGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(this.maxPoints * 3), 3));
+        tracerGeo.setDrawRange(0, 0);
+
+        const tracerMat = new THREE.LineBasicMaterial({ vertexColors: true, linewidth: 2 });
+        this.tracer = new THREE.Line(tracerGeo, tracerMat);
+        this.tracer.frustumCulled = false;
+        this.scene.add(this.tracer);
+
         this.isInitialized = true;
         this.animate();
 
@@ -140,6 +153,24 @@ class PuttingView3D {
     startPuttAnimation(trajectoryData) {
         this.animationData = trajectoryData;
         this.frameIndex = 0;
+
+        // Reset Tracer
+        if (this.tracer) {
+            this.tracer.geometry.setDrawRange(0, 0);
+        }
+
+        // Pre-calculate max speed for normalization
+        this.maxSpeed = 0;
+        if (trajectoryData && trajectoryData.path) {
+            trajectoryData.path.forEach(p => {
+                if (p.speed > this.maxSpeed) this.maxSpeed = p.speed;
+            });
+        }
+    }
+
+    getSpeedColor(speed) {
+        const ratio = Math.max(0, Math.min(1, speed / (this.maxSpeed || 1)));
+        return new THREE.Color().setRGB(ratio, 1 - ratio, 0);
     }
 
     animate() {
@@ -165,6 +196,25 @@ class PuttingView3D {
             // Camera follow (Softly)
             this.camera.position.x = p.x * 0.5;
             this.camera.position.z = -p.y + 1.5;
+
+            // Tracer update
+            if (this.tracer && this.frameIndex < this.maxPoints) {
+                const positions = this.tracer.geometry.attributes.position.array;
+                const colors = this.tracer.geometry.attributes.color.array;
+
+                positions[this.frameIndex * 3] = p.x;
+                positions[this.frameIndex * 3 + 1] = 0.01; // Slightly above ground
+                positions[this.frameIndex * 3 + 2] = -p.y;
+
+                const color = this.getSpeedColor(p.speed || 0);
+                colors[this.frameIndex * 3] = color.r;
+                colors[this.frameIndex * 3 + 1] = color.g;
+                colors[this.frameIndex * 3 + 2] = color.b;
+
+                this.tracer.geometry.attributes.position.needsUpdate = true;
+                this.tracer.geometry.attributes.color.needsUpdate = true;
+                this.tracer.geometry.setDrawRange(0, this.frameIndex + 1);
+            }
 
             this.frameIndex += 1;
         }
