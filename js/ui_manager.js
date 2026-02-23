@@ -43,6 +43,18 @@ window.appState = {
 
 const PIXELS_PER_METER = 50;
 
+function chipSpeedToColor(speed, maxSpeed) {
+    if (!maxSpeed || maxSpeed <= 0) {
+        return 'rgba(255,255,255,1)'; // Fallback: white
+    }
+    const ratio = Math.max(0, Math.min(1, speed / maxSpeed));
+    // Interpolate between white (0) and a bright green (max)
+    const r = Math.round(255 + (34 - 255) * ratio);  // 255 -> 34
+    const g = Math.round(255 + (197 - 255) * ratio); // 255 -> 197
+    const b = Math.round(255 + (94 - 255) * ratio);  // 255 -> 94
+    return `rgba(${r},${g},${b},1)`;
+}
+
 window.initTabs = function () {
     const tabSwing = document.getElementById('tab-swing');
     const tabChip = document.getElementById('tab-chip');
@@ -355,17 +367,32 @@ window.drawPersistentChipProfile = function (ctx, canvas, result) {
 
     const flightEnd = result.flightPathEndIndex || result.path.length;
 
-    // Draw flight phase (white)
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.strokeStyle = 'white';
+    // Determine max speed during flight for color normalization
+    let maxSpeed = 0;
     for (let i = 0; i < flightEnd; i++) {
         const p = result.path[i];
-        const cx = p.x * pxPerM;
-        const cy = groundY - (p.z * verticalPxPerM);
-        if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+        if (p && typeof p.speed === 'number' && p.speed > maxSpeed) {
+            maxSpeed = p.speed;
+        }
     }
-    ctx.stroke();
+
+    // Draw flight phase with speed-based color
+    ctx.lineWidth = 2;
+    for (let i = 1; i < flightEnd; i++) {
+        const p0 = result.path[i - 1];
+        const p1 = result.path[i];
+        if (!p0 || !p1) continue;
+        const speed = typeof p1.speed === 'number' ? p1.speed : 0;
+        ctx.strokeStyle = chipSpeedToColor(speed, maxSpeed);
+        ctx.beginPath();
+        const x0 = p0.x * pxPerM;
+        const y0 = groundY - (p0.z * verticalPxPerM);
+        const x1 = p1.x * pxPerM;
+        const y1 = groundY - (p1.z * verticalPxPerM);
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        ctx.stroke();
+    }
 
     // Draw roll phase (yellow)
     ctx.beginPath();
@@ -412,17 +439,42 @@ window.animate = function (result) {
             const { maxDist, minHeight: minH, maxHeight: maxH } = appState.chipBounds;
             const totalH = maxH - minH;
             const groundY = canvas.height * (1 - (0 - minH) / totalH);
-            const pxPerM = canvas.width / maxDist, verticalPxPerM = canvas.height / totalH;
+            const pxPerM = canvas.width / maxDist;
+            const verticalPxPerM = canvas.height / totalH;
             const flightEnd = result.flightPathEndIndex || result.path.length;
-            ctx.beginPath();
-            for (let i = 0; i <= frame; i++) {
+
+            // Compute max speed during flight for color normalization
+            let maxSpeed = 0;
+            for (let i = 0; i < flightEnd; i++) {
                 const p = result.path[i];
-                const x = p.x * pxPerM, y = groundY - (p.z * verticalPxPerM);
-                if (i === flightEnd) { ctx.stroke(); ctx.beginPath(); ctx.strokeStyle = '#FACC15'; ctx.moveTo(x, y); }
-                else if (i === 0) { ctx.moveTo(x, y); ctx.strokeStyle = '#FFFFFF'; }
-                else ctx.lineTo(x, y);
+                if (p && typeof p.speed === 'number' && p.speed > maxSpeed) {
+                    maxSpeed = p.speed;
+                }
             }
-            ctx.stroke();
+
+            // Draw up to current frame with speed-based color on flight, yellow on roll
+            for (let i = 1; i <= frame && i < result.path.length; i++) {
+                const p0 = result.path[i - 1];
+                const p1 = result.path[i];
+                if (!p0 || !p1) continue;
+
+                const x0 = p0.x * pxPerM;
+                const y0 = groundY - (p0.z * verticalPxPerM);
+                const x1 = p1.x * pxPerM;
+                const y1 = groundY - (p1.z * verticalPxPerM);
+
+                if (i <= flightEnd) {
+                    const speed = typeof p1.speed === 'number' ? p1.speed : 0;
+                    ctx.strokeStyle = chipSpeedToColor(speed, maxSpeed);
+                } else {
+                    ctx.strokeStyle = '#FACC15';
+                }
+
+                ctx.beginPath();
+                ctx.moveTo(x0, y0);
+                ctx.lineTo(x1, y1);
+                ctx.stroke();
+            }
             const p = result.path[frame];
             ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(p.x * pxPerM, groundY - (p.z * verticalPxPerM), 4, 0, Math.PI * 2); ctx.fill();
         } else {

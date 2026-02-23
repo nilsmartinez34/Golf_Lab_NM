@@ -225,7 +225,9 @@ class PhysicsEngine {
             spinRate *= (1.0 - 0.04 * dt);
 
             if (pos.z > maxHeight) maxHeight = pos.z;
-            trajectory.push({ x: pos.x, y: pos.y, z: pos.z, t });
+            // Store instantaneous speed magnitude for visualization (m/s)
+            const instSpeed = Vec3.mag(vel);
+            trajectory.push({ x: pos.x, y: pos.y, z: pos.z, t, speed: instSpeed });
 
             if (pos.z <= 0) {
                 pos.z = 0;
@@ -315,8 +317,14 @@ class PhysicsEngine {
         let isRolling = true;
         let rollDist = 0;
 
-        // Push start point
-        rollPath.push({ x: posC.x, y: posC.y, z: 0, t: 0 }); // Relative time
+        // Push start point with initial rolling speed
+        rollPath.push({
+            x: posC.x,
+            y: posC.y,
+            z: 0,
+            t: 0,
+            speed: Math.sqrt(vel.x * vel.x + vel.y * vel.y)
+        }); // Relative time
 
         while (isRolling && t < 10.0) {
             const speed = Math.sqrt(vel.x * vel.x + vel.y * vel.y);
@@ -357,7 +365,13 @@ class PhysicsEngine {
             posC.x += vel.x * dt;
             posC.y += vel.y * dt;
 
-            rollPath.push({ x: posC.x, y: posC.y, z: 0, t: t + dt });
+            rollPath.push({
+                x: posC.x,
+                y: posC.y,
+                z: 0,
+                t: t + dt,
+                speed: Math.sqrt(vel.x * vel.x + vel.y * vel.y)
+            });
 
             // Spin Decay during roll (friction eats spin)
             spinRate *= (1.0 - 2.0 * dt); // Fast decay on ground
