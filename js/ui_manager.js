@@ -617,3 +617,46 @@ function renderHistory() {
         list.appendChild(div);
     });
 }
+
+
+document.getElementById('btn-memo-trigger').addEventListener('click', () => {
+    const memoHTML = `
+        <div class="memo-content">
+            <h2 style="margin-top:0; color:#4ADE80;">MÉMO STRATÉGIQUE</h2>
+            
+            <div class="memo-section" style="border-color: #4ADE80;">
+                <h3>🟢 PUTTING (Stimp 10)</h3>
+                <table class="memo-table">
+                    <tr><td>Aim Point</td><td><b>7.5 cm</b> / degré de pente</td></tr>
+                    <tr><td>Play As (Montée)</td><td><b>+12 cm</b> / degré</td></tr>
+                    <tr><td>Play As (Descente)</td><td><b>-10 cm</b> / degré</td></tr>
+                </table>
+            </div>
+
+            <div class="memo-section" style="border-color: #FACC15;">
+                <h3 style="color:#FACC15;">🟡 CHIPPING (Ratio Portée:Roule)</h3>
+                <table class="memo-table">
+                    <tr><th>Club</th><th>Ratio</th><th>Usage</th></tr>
+                    <tr><td>7i</td><td><b>1 : 4.3</b></td><td>Bump & Run</td></tr>
+                    <tr><td>PW</td><td><b>1 : 2.7</b></td><td>Standard</td></tr>
+                    <tr><td>SW</td><td><b>1 : 2.0</b></td><td>Zone courte</td></tr>
+                    <tr><td>LW</td><td><b>1 : 1.7</b></td><td>Lobé</td></tr>
+                    <tr><td>Put</td><td><b>1 : 39</b></td><td>Bord de green</td></tr>
+                </table>
+            </div>
+
+            <div class="memo-section" style="border-color: #F87171;">
+                <h3 style="color:#F87171;">🔴 SWING : VENT (105mph)</h3>
+                <table class="memo-table">
+                    <tr><th>Vent</th><th>10 km/h</th><th>20 km/h</th></tr>
+                    <tr><td>Face</td><td>-2.1m (+0.8m h)</td><td>-4.5m (+1.9m h)</td></tr>
+                    <tr><td>Dos</td><td>+1.6m (-0.5m h)</td><td>+3.2m (-1.1m h)</td></tr>
+                    <tr><td>Latéral</td><td>1.8m dérive</td><td>3.7m dérive</td></tr>
+                </table>
+            </div>
+        </div>
+    `;
+
+    // Utilise ta fonction de modale existante
+    window.uiManager.showModal(memoHTML);
+});

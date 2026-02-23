@@ -1623,3 +1623,65 @@ body:has(#swing-content:not([style*="display: none"])) .bottom-controls {
     font-weight: 700;
     cursor: pointer;
 }
+
+/* Bouton Flottant (FAB) */
+.memo-fab {
+    position: absolute;
+    bottom: 80px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #4ADE80;
+    color: #4ADE80;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+}
+
+/* Style de la modale Mémo */
+.memo-content {
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+}
+
+.memo-section {
+    margin-bottom: 20px;
+    border-left: 3px solid #4ADE80;
+    padding-left: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 0 8px 8px 0;
+}
+
+.memo-section h3 {
+    font-size: 14px;
+    margin: 0 0 10px 0;
+    color: #4ADE80;
+}
+
+.memo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.memo-table th {
+    text-align: left;
+    color: #888;
+    padding-bottom: 5px;
+}
+
+.memo-table td {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ratio-bar {
+    display: inline-block;
+    height: 4px;
+    background: #4ADE80;
+    border-radius: 2px;
+}
