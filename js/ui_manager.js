@@ -292,7 +292,11 @@ window.drawChipProfile = function (ctx, canvas) {
 };
 
 window.drawPuttGrid = function (ctx, canvas) {
-    ctx.fillStyle = '#064E3B';
+    // 1. Bird's Eye Green Background
+    const greenGrad = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 50, canvas.width / 2, canvas.height / 2, canvas.width);
+    greenGrad.addColorStop(0, '#065F46'); // Darker center
+    greenGrad.addColorStop(1, '#064E3B'); // Very dark edges
+    ctx.fillStyle = greenGrad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const cx = canvas.width / 2;
@@ -303,41 +307,59 @@ window.drawPuttGrid = function (ctx, canvas) {
     ctx.lineWidth = 1;
     ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.font = '10px Inter';
-    ctx.textAlign = 'left';
 
-    for (let x = cx; x < canvas.width; x += gridStep) {
+    // Vertical Lines & Lateral Labels
+    ctx.textAlign = 'center';
+    for (let x = cx, d = 0; x < canvas.width; x += gridStep, d += 0.5) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        if (d > 0 && Number.isInteger(d)) ctx.fillText(`${d}m R`, x, cy + 20);
     }
-    for (let x = cx - gridStep; x > 0; x -= gridStep) {
+    for (let x = cx - gridStep, d = 0.5; x > 0; x -= gridStep, d += 0.5) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        if (Number.isInteger(d)) ctx.fillText(`${d}m L`, x, cy + 20);
     }
+
+    // Horizontal Lines & Depth Labels
+    ctx.textAlign = 'left';
     for (let y = cy, d = 0; y < canvas.height; y += gridStep, d += 0.5) {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-        if (d > 0 && Number.isInteger(d)) ctx.fillText(`${d}m`, cx + 5, y - 2);
+        if (d > 0 && Number.isInteger(d)) ctx.fillText(`+${d}m`, cx + 10, y - 2);
     }
     for (let y = cy - gridStep, d = 0.5; y > 0; y -= gridStep, d += 0.5) {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-        if (Number.isInteger(d)) ctx.fillText(`${d}m`, cx + 5, y - 2);
+        if (Number.isInteger(d)) {
+            const label = d === appState.puttDist ? `HOLE (${d}m)` : `${d}m`;
+            ctx.fillStyle = d === appState.puttDist ? '#4ADE80' : 'rgba(255, 255, 255, 0.4)';
+            ctx.fillText(label, cx + 10, y - 2);
+        }
     }
 
+    // 2. Start Position (Ball)
     ctx.fillStyle = 'white';
     ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 1; ctx.stroke();
 
+    // 3. Aim Target (Crosshair)
     const aimAngleRad = appState.puttAim * Math.PI / 180;
     const aimDisplacement = appState.puttPlayAs * Math.sin(aimAngleRad);
     const aimDepth = appState.puttPlayAs * Math.cos(aimAngleRad);
-
     const aimX = cx + aimDisplacement * PIXELS_PER_METER;
     const aimY = cy - aimDepth * PIXELS_PER_METER;
-    ctx.strokeStyle = '#4ADE80';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(aimX - 8, aimY); ctx.lineTo(aimX + 8, aimY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(aimX, aimY - 8); ctx.lineTo(aimX, aimY + 8); ctx.stroke();
 
+    ctx.strokeStyle = '#FACC15'; // Yellow Aim
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(aimX - 10, aimY); ctx.lineTo(aimX + 10, aimY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(aimX, aimY - 10); ctx.lineTo(aimX, aimY + 10); ctx.stroke();
+
+    // 4. Hole (The Goal)
     const holeY = cy - appState.puttDist * PIXELS_PER_METER;
-    ctx.fillStyle = 'rgba(0,0,0,0.4)';
-    ctx.beginPath(); ctx.arc(cx, holeY, 8, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#4ADE80'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#000000';
+    ctx.beginPath(); ctx.arc(cx, holeY, 9, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#4ADE80'; ctx.lineWidth = 2; ctx.stroke();
+
+    // Flagstick shadow/base representation
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.beginPath(); ctx.arc(cx, holeY, 2, 0, Math.PI * 2); ctx.fill();
 }
 
 window.drawPersistentSwingTrajectory = function (ctx, canvas, result) {
