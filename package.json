@@ -1,0 +1,25 @@
+{
+  "name": "golf-lab-nm",
+  "version": "1.0.0",
+  "description": "High-performance, web-based golf simulator with advanced physics and dashboards.",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "test:physics": "jest --runTestsByPath tests/physics.test.js tests/chipping.test.js",
+    "lint": "eslint . --ext .js",
+    "format": "prettier --write .",
+    "build:wasm": "powershell -ExecutionPolicy Bypass -File ./scripts/build_wasm.ps1"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "jest": "^29.0.0",
+    "prettier": "^3.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
+  }
+}

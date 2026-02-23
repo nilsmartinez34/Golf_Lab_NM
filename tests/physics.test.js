@@ -1,4 +1,4 @@
-const PhysicsEngine = require('../physics_ultimate');
+const PhysicsEngine = require('../js/physics_ultimate.js');
 
 describe('Physics Engine Ultimate Test Suite', () => {
 
