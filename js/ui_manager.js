@@ -258,8 +258,8 @@ window.drawChipProfile = function (ctx, canvas) {
     const { maxDist, maxHeight, minHeight } = appState.chipBounds;
     const totalHeightRange = maxHeight - minHeight;
 
-    // Ground line at Y=0, positioned proportionally
-    const groundY = canvas.height * (1 - (0 - minHeight) / totalHeightRange); // ~67% from top
+    // Ground line at Y=0, positioned lower for more flight space (85% from top)
+    const groundY = canvas.height * 0.85;
 
     // Sky gradient (above ground)
     const skyGrad = ctx.createLinearGradient(0, 0, 0, groundY);
@@ -279,7 +279,7 @@ window.drawChipProfile = function (ctx, canvas) {
     ctx.textAlign = 'center';
 
     const pxPerM = canvas.width / maxDist;
-    const verticalPxPerM = canvas.height / totalHeightRange;
+    const verticalPxPerM = groundY / maxHeight;
 
     // Vertical grid lines (distance markers)
     for (let d = 0; d <= maxDist; d += 5) {
@@ -443,9 +443,9 @@ window.drawPersistentChipProfile = function (ctx, canvas, result) {
     const { maxDist, maxHeight, minHeight } = appState.chipBounds;
     const totalHeightRange = maxHeight - minHeight;
 
-    const groundY = canvas.height * (1 - (0 - minHeight) / totalHeightRange);
+    const groundY = canvas.height * 0.85;
     const pxPerM = canvas.width / maxDist;
-    const verticalPxPerM = canvas.height / totalHeightRange;
+    const verticalPxPerM = groundY / maxHeight;
 
     const flightEnd = result.flightPathEndIndex || result.path.length;
 
@@ -530,9 +530,9 @@ window.animate = function (result) {
         } else if (appState.mode === 'chip') {
             const { maxDist, minHeight: minH, maxHeight: maxH } = appState.chipBounds;
             const totalH = maxH - minH;
-            const groundY = canvas.height * (1 - (0 - minH) / totalH);
+            const groundY = canvas.height * 0.85;
             const pxPerM = canvas.width / maxDist;
-            const verticalPxPerM = canvas.height / totalH;
+            const verticalPxPerM = groundY / maxH;
             const flightEnd = result.flightPathEndIndex || result.path.length;
 
             let maxSpeed = 0;
