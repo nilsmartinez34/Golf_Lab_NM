@@ -210,8 +210,7 @@ body:has(#chip-content:not([style*="display: none"])) .top-metrics {
 }
 
 body:has(#chip-content:not([style*="display: none"])) .gameplay-zone {
-    height: 50vh;
-    flex: none;
+    flex: 1;
 }
 
 body:has(#chip-content:not([style*="display: none"])) .bottom-controls {
