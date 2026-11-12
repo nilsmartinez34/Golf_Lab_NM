@@ -1953,3 +1953,104 @@ body:has(#chip-content:not([style*="display: none"])) .bottom-controls {
     font-weight: 800;
     letter-spacing: 1px;
 }
+
+/* Game Slingshot & Bottom Panel */
+.game-slingshot-hint {
+    position: absolute;
+    bottom: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 0.4s ease;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-slingshot-hint .hint-arrow {
+    font-size: 1rem;
+    color: var(--accent);
+    animation: bounceDown 1.2s infinite;
+}
+
+@keyframes bounceDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+}
+
+.game-slingshot-hint span {
+    font-size: 0.6875rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: 1px;
+    display: block;
+}
+
+.game-slingshot-hint .hint-sub {
+    font-size: 0.5625rem;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.game-bottom-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.game-club-row {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.game-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.game-status-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.game-status-item .status-lbl {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.game-status-item .status-val {
+    font-size: 0.8125rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.game-view-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.game-view-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

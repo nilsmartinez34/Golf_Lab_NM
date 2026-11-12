@@ -15,40 +15,23 @@
     </div>
     <div class="metric-group">
         <div class="metric-item">
-            <span class="label">SCORE TOTAL</span>
+            <span class="label">SCORE</span>
             <div class="value-group"><span id="game-val-score">E</span></div>
         </div>
         <div class="metric-item">
-            <span class="label">PHASE</span>
-            <div class="value-group"><span id="game-val-phase">SWING</span></div>
+            <span class="label">CLUB</span>
+            <div class="value-group"><span id="game-val-club">DR</span></div>
         </div>
     </div>
 </div>
 
 <!-- CONTENT -->
 <div id="game-content">
-    <div class="hud bottom-left" id="hud-game-lie">
-        <span class="hud-title">CONDITION DU LIE</span>
-        <div class="hud-item">
-            <span class="hud-label">TERRAIN</span>
-            <span class="hud-value" id="game-hud-lie-label">TEE (100%)</span>
-        </div>
-        <div class="hud-item">
-            <span class="hud-label">DISPERSION</span>
-            <span class="hud-value" id="game-hud-dispersion">0.0%</span>
-        </div>
-    </div>
-
-    <div class="hud bottom-right" id="hud-game-risk">
-        <span class="hud-title">RÉGULATION VITESSE</span>
-        <div class="hud-item">
-            <span class="hud-label">ZONE</span>
-            <span class="hud-value" id="game-hud-risk-label" style="color: #4ADE80;">CONTRÔLE</span>
-        </div>
-        <div class="hud-item">
-            <span class="hud-label">ALTÉRATION</span>
-            <span class="hud-value" id="game-hud-risk-pct">0.0%</span>
-        </div>
+    <!-- Live Shot Guidance / Slingshot Feedback -->
+    <div class="game-slingshot-hint" id="game-slingshot-hint">
+        <div class="hint-arrow">▼</div>
+        <span>TIREZ DEPUIS LA BALLE VERS LE BAS</span>
+        <div class="hint-sub">Gauche = Draw · Droite = Fade</div>
     </div>
 
     <!-- Celebration / Next Hole Modal Overlay -->
@@ -60,7 +43,7 @@
             <div class="hole-score-stats">
                 <div class="stat-col"><span class="stat-lbl">Score Trou</span><span class="stat-val" id="card-hole-score">4</span></div>
                 <div class="stat-col"><span class="stat-lbl">Au Par</span><span class="stat-val" id="card-hole-diff">E</span></div>
-                <div class="stat-col"><span class="stat-lbl">Score Total</span><span class="stat-val" id="card-total-score">E</span></div>
+                <div class="stat-col"><span class="stat-lbl">Total</span><span class="stat-val" id="card-total-score">E</span></div>
             </div>
             <div class="hole-card-actions">
                 <button class="action-btn-punchy" id="btn-next-hole">TROU SUIVANT ➔</button>
@@ -71,10 +54,26 @@
 
 <!-- FOOTER -->
 <div id="game-footer" class="footer-segment">
-    <div class="game-dashboard">
-        <!-- Sub-panel dynamically refreshed or toggled according to phase -->
-        <div id="game-controls-container">
-            <!-- Injected by js/game_logic.js depending on Swing, Chip, or Putt -->
+    <div class="game-bottom-panel">
+        <div class="game-club-row">
+            <div class="club-belt" id="game-club-belt">
+                <!-- Dynamically generated club buttons -->
+            </div>
+        </div>
+        <div class="game-status-bar">
+            <div class="game-status-item">
+                <span class="status-lbl">LIE</span>
+                <span class="status-val" id="game-status-lie">TEE (100%)</span>
+            </div>
+            <div class="game-status-item">
+                <span class="status-lbl">PENTE</span>
+                <span class="status-val" id="game-status-slope">0.0°</span>
+            </div>
+            <div class="game-status-item">
+                <span class="status-lbl">VENT</span>
+                <span class="status-val" id="game-status-wind">12 km/h</span>
+            </div>
+            <button class="game-view-btn" id="btn-toggle-view" title="Basculer la vue">🗺️ CARTE</button>
         </div>
     </div>
 </div>
