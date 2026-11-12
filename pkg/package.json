@@ -1,0 +1,19 @@
+{
+  "name": "golf_physics_core",
+  "type": "module",
+  "collaborators": [
+    "NM - Golf Lab"
+  ],
+  "description": "High-precision deterministic golf physics engine (RK4)",
+  "version": "0.1.0",
+  "files": [
+    "golf_physics_core_bg.wasm",
+    "golf_physics_core.js",
+    "golf_physics_core.d.ts"
+  ],
+  "main": "golf_physics_core.js",
+  "types": "golf_physics_core.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
