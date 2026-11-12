@@ -1,0 +1,80 @@
+<div class="metric-container" id="game-metrics-header">
+    <div class="metric-group">
+        <div class="metric-item">
+            <span class="label">TROU</span>
+            <div class="value-group"><span id="game-val-hole">1</span><span class="unit" id="game-val-par">PAR 4</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">AU MÂT</span>
+            <div class="value-group"><span id="game-val-dist">365</span><span class="unit">M</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">COUP</span>
+            <div class="value-group"><span id="game-val-stroke">1</span><span class="unit" id="game-val-lie">TEE</span></div>
+        </div>
+    </div>
+    <div class="metric-group">
+        <div class="metric-item">
+            <span class="label">SCORE TOTAL</span>
+            <div class="value-group"><span id="game-val-score">E</span></div>
+        </div>
+        <div class="metric-item">
+            <span class="label">PHASE</span>
+            <div class="value-group"><span id="game-val-phase">SWING</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div id="game-content">
+    <div class="hud bottom-left" id="hud-game-lie">
+        <span class="hud-title">CONDITION DU LIE</span>
+        <div class="hud-item">
+            <span class="hud-label">TERRAIN</span>
+            <span class="hud-value" id="game-hud-lie-label">TEE (100%)</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">DISPERSION</span>
+            <span class="hud-value" id="game-hud-dispersion">0.0%</span>
+        </div>
+    </div>
+
+    <div class="hud bottom-right" id="hud-game-risk">
+        <span class="hud-title">RÉGULATION VITESSE</span>
+        <div class="hud-item">
+            <span class="hud-label">ZONE</span>
+            <span class="hud-value" id="game-hud-risk-label" style="color: #4ADE80;">CONTRÔLE</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">ALTÉRATION</span>
+            <span class="hud-value" id="game-hud-risk-pct">0.0%</span>
+        </div>
+    </div>
+
+    <!-- Celebration / Next Hole Modal Overlay -->
+    <div id="game-hole-modal" class="game-hole-overlay" style="display: none;">
+        <div class="game-hole-card">
+            <div class="hole-card-badge" id="hole-result-badge">PAR</div>
+            <h2 id="hole-result-title">TROU COMPLÉTÉ !</h2>
+            <p id="hole-result-desc">4 coups sur ce Par 4</p>
+            <div class="hole-score-stats">
+                <div class="stat-col"><span class="stat-lbl">Score Trou</span><span class="stat-val" id="card-hole-score">4</span></div>
+                <div class="stat-col"><span class="stat-lbl">Au Par</span><span class="stat-val" id="card-hole-diff">E</span></div>
+                <div class="stat-col"><span class="stat-lbl">Score Total</span><span class="stat-val" id="card-total-score">E</span></div>
+            </div>
+            <div class="hole-card-actions">
+                <button class="action-btn-punchy" id="btn-next-hole">TROU SUIVANT ➔</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div id="game-footer" class="footer-segment">
+    <div class="game-dashboard">
+        <!-- Sub-panel dynamically refreshed or toggled according to phase -->
+        <div id="game-controls-container">
+            <!-- Injected by js/game_logic.js depending on Swing, Chip, or Putt -->
+        </div>
+    </div>
+</div>

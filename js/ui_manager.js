@@ -76,10 +76,12 @@ window.initTabs = function () {
     const tabSwing = document.getElementById('tab-swing');
     const tabChip = document.getElementById('tab-chip');
     const tabPutt = document.getElementById('tab-putt');
+    const tabGame = document.getElementById('tab-game');
 
     if (tabSwing) tabSwing.onclick = () => { console.log("Tab Swing Clicked"); window.switchMode('swing'); };
     if (tabChip) tabChip.onclick = () => { console.log("Tab Chip Clicked"); window.switchMode('chip'); };
     if (tabPutt) tabPutt.onclick = () => { console.log("Tab Putt Clicked"); window.switchMode('putt'); };
+    if (tabGame) tabGame.onclick = () => { console.log("Tab Game Clicked"); window.switchMode('game'); };
 };
 
 window.initUI = function () {
@@ -94,6 +96,13 @@ window.initUI = function () {
 
     // History Modal
     const historyModal = document.getElementById('history-modal');
+    const btnHistoryTrigger = document.getElementById('btn-history-trigger');
+    if (btnHistoryTrigger) {
+        btnHistoryTrigger.onclick = () => {
+            window.renderHistory();
+            historyModal.style.display = 'flex';
+        };
+    }
     const btnCloseHistory = document.getElementById('btnCloseHistory');
     if (btnCloseHistory) btnCloseHistory.onclick = () => historyModal.style.display = 'none';
 
@@ -191,16 +200,21 @@ window.initMainCanvas = function () {
 
 window.drawBackground = function (ctx, canvas) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (appState.mode === 'swing') {
+    const inGame = appState.mode === 'game';
+    const gamePhase = inGame && window.gameState ? window.gameState.phase : null;
+
+    if (appState.mode === 'swing' || (inGame && gamePhase === 'swing')) {
         window.drawSwingGrid(ctx, canvas);
         if (appState.trajectoryResult && !appState.trajectoryResult.isPutt && !appState.isAnimating) {
             window.drawPersistentSwingTrajectory(ctx, canvas, appState.trajectoryResult);
         }
-    } else if (appState.mode === 'chip') {
+        if (inGame) window.drawGameRadar(ctx, canvas);
+    } else if (appState.mode === 'chip' || (inGame && gamePhase === 'chip')) {
         window.drawChipProfile(ctx, canvas);
         if (appState.trajectoryResult && !appState.trajectoryResult.isPutt && !appState.isAnimating) {
             window.drawPersistentChipProfile(ctx, canvas, appState.trajectoryResult);
         }
+        if (inGame) window.drawGameRadar(ctx, canvas);
     } else {
         window.drawPuttGrid(ctx, canvas);
         if (appState.trajectoryResult && appState.trajectoryResult.isPutt && !appState.isAnimating) {
@@ -211,15 +225,20 @@ window.drawBackground = function (ctx, canvas) {
 
 window.drawSwingGrid = function (ctx, canvas) {
     const horizonY = canvas.height * 0.38;
+
+    // 1. Dégradé de ciel réaliste
     const skyGradient = ctx.createLinearGradient(0, 0, 0, horizonY);
-    skyGradient.addColorStop(0, '#1E40AF');
-    skyGradient.addColorStop(1, '#60A5FA');
+    skyGradient.addColorStop(0, '#0F2B5C');
+    skyGradient.addColorStop(0.65, '#2563EB');
+    skyGradient.addColorStop(1, '#93C5FD');
     ctx.fillStyle = skyGradient;
     ctx.fillRect(0, 0, canvas.width, horizonY);
 
+    // 2. Base de rough (herbe dense)
     const groundGradient = ctx.createLinearGradient(0, horizonY, 0, canvas.height);
-    groundGradient.addColorStop(0, '#064E3B');
-    groundGradient.addColorStop(1, '#10B981');
+    groundGradient.addColorStop(0, '#042F2E');
+    groundGradient.addColorStop(0.3, '#064E3B');
+    groundGradient.addColorStop(1, '#065F46');
     ctx.fillStyle = groundGradient;
     ctx.fillRect(0, horizonY, canvas.width, canvas.height - horizonY);
 
@@ -227,32 +246,178 @@ window.drawSwingGrid = function (ctx, canvas) {
     const groundRange = groundStartY - horizonY;
     const k = 0.0052;
 
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    // 3. Bandes de tonte du Fairway (Mowing Stripes alternées)
+    const fairwayHalfWidth = 26; // 52m de large au sol
+    for (let d = 380; d >= 0; d -= 20) {
+        const sc0 = Math.exp(-k * d);
+        const sc1 = Math.exp(-k * (d + 20));
+        const y0 = horizonY + (groundRange * sc0);
+        const y1 = horizonY + (groundRange * sc1);
+
+        const w0 = fairwayHalfWidth * sc0 * 20.0;
+        const w1 = fairwayHalfWidth * sc1 * 20.0;
+        const cx = canvas.width * 0.5;
+
+        ctx.fillStyle = (d / 20) % 2 === 0 ? '#10B981' : '#059669';
+        ctx.beginPath();
+        ctx.moveTo(cx - w0, y0);
+        ctx.lineTo(cx - w1, y1);
+        ctx.lineTo(cx + w1, y1);
+        ctx.lineTo(cx + w0, y0);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // 4. Lignes de perspective et grille
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
     ctx.lineWidth = 1;
-    const lateralLines = 10;
+    const lateralLines = 8;
     for (let i = -lateralLines; i <= lateralLines; i++) {
         ctx.beginPath();
-        for (let d = 0; d <= 400; d += 10) {
+        for (let d = 0; d <= 400; d += 15) {
             const scale = Math.exp(-k * d);
-            const x = (canvas.width * 0.5) + (i * 20 * scale);
+            const x = (canvas.width * 0.5) + (i * 18 * scale * 1.5);
             const y = horizonY + (groundRange * scale);
             if (d === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
         ctx.stroke();
     }
 
-    for (let d = 0; d <= 300; d += 50) {
+    // Lignes horizontales de distance
+    for (let d = 50; d <= 300; d += 50) {
         const scale = Math.exp(-k * d);
         const y = horizonY + (groundRange * scale);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
         ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
+        ctx.moveTo((canvas.width * 0.5) - (fairwayHalfWidth * scale * 20), y);
+        ctx.lineTo((canvas.width * 0.5) + (fairwayHalfWidth * scale * 20), y);
         ctx.stroke();
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 12px Inter, sans-serif';
-        ctx.fillText(`${d}m`, 10, y - 5);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.fillText(`${d}m`, 12, y - 4);
     }
-}
+
+    // 5. Cible : Green & Drapeau au loin (Mode Jeu ou défaut à 250m)
+    let pinDistance = 250;
+    if (appState.mode === 'game' && window.gameState && window.gameState.currentHole) {
+        pinDistance = window.gameState.ballPosition.distanceToPin;
+    }
+
+    if (pinDistance > 10 && pinDistance <= 450) {
+        const scPin = Math.exp(-k * pinDistance);
+        const pinY = horizonY + (groundRange * scPin);
+        const pinX = canvas.width * 0.5;
+
+        // Ellipse du green
+        ctx.fillStyle = '#34D399';
+        ctx.beginPath();
+        ctx.ellipse(pinX, pinY, Math.max(8, 28 * scPin * 15), Math.max(4, 9 * scPin * 15), 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#059669';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Mât du drapeau
+        const poleHeight = Math.max(16, 45 * scPin);
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = Math.max(1.5, 3 * scPin);
+        ctx.beginPath();
+        ctx.moveTo(pinX, pinY);
+        ctx.lineTo(pinX, pinY - poleHeight);
+        ctx.stroke();
+
+        // Fanion rouge
+        const flagW = Math.max(10, 22 * scPin);
+        const flagH = Math.max(6, 14 * scPin);
+        ctx.fillStyle = '#EF4444';
+        ctx.beginPath();
+        ctx.moveTo(pinX, pinY - poleHeight);
+        ctx.lineTo(pinX + flagW, pinY - poleHeight + (flagH * 0.5));
+        ctx.lineTo(pinX, pinY - poleHeight + flagH);
+        ctx.closePath();
+        ctx.fill();
+
+        // Badge distance au mât
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+        ctx.beginPath();
+        ctx.roundRect(pinX - 25, pinY - poleHeight - 16, 50, 14, 4);
+        ctx.fill();
+        ctx.fillStyle = '#4ADE80';
+        ctx.font = '900 9px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`📍 ${Math.round(pinDistance)}m`, pinX, pinY - poleHeight - 5);
+        ctx.textAlign = 'left';
+    }
+};
+
+window.drawGameRadar = function (ctx, canvas) {
+    if (!window.gameState || !window.gameState.currentHole) return;
+    const hole = window.gameState.currentHole;
+    const pos = window.gameState.ballPosition;
+
+    const rw = 100, rh = 135;
+    const rx = 12, ry = 12;
+
+    // Fond radar glassmorphism
+    ctx.save();
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(rx, ry, rw, rh, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    // Titre trou
+    ctx.fillStyle = '#4ADE80';
+    ctx.font = '900 9px Inter, sans-serif';
+    ctx.fillText(`T${hole.number} · PAR ${hole.par}`, rx + 8, ry + 16);
+
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '700 8px Inter, sans-serif';
+    ctx.fillText(`${Math.round(pos.distanceToPin)}m au mât`, rx + 8, ry + 27);
+
+    // Représentation top-down (Départ en bas, mât en haut)
+    const mapY0 = ry + rh - 15;
+    const mapY1 = ry + 40;
+    const mapH = mapY0 - mapY1;
+    const mapCx = rx + (rw * 0.5);
+
+    // Fairway bande verte
+    ctx.fillStyle = '#065F46';
+    ctx.fillRect(mapCx - 14, mapY1 + 10, 28, mapH - 10);
+    ctx.fillStyle = '#10B981';
+    ctx.fillRect(mapCx - 10, mapY1 + 10, 20, mapH - 10);
+
+    // Green (cercle en haut)
+    ctx.fillStyle = '#34D399';
+    ctx.beginPath();
+    ctx.arc(mapCx, mapY1, 9, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Drapeau
+    ctx.fillStyle = '#EF4444';
+    ctx.beginPath();
+    ctx.arc(mapCx, mapY1, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Position de la balle
+    const progress = Math.max(0, Math.min(1, 1 - (pos.distanceToPin / hole.totalDistance)));
+    const ballY = mapY0 - (progress * (mapH - 5));
+    const ballX = mapCx + Math.max(-16, Math.min(16, pos.lateralOffset * 0.6));
+
+    // Balle en blanc pulsant
+    ctx.fillStyle = '#FFFFFF';
+    ctx.shadowColor = '#4ADE80';
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.arc(ballX, ballY, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.restore();
+};
 
 window.drawChipProfile = function (ctx, canvas) {
     const { maxDist, maxHeight, minHeight } = appState.chipBounds;
@@ -590,7 +755,23 @@ window.animate = function (result) {
             const currentP = result.path[frame];
             if (currentP) {
                 const sc = Math.exp(-k * currentP.x);
-                ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc((canvas.width * 0.5) + (currentP.y * sc * VS), (hY + (gR * sc)) - (currentP.z * sc * VS), Math.max(2, 6 * sc), 0, Math.PI * 2); ctx.fill();
+                const ballScreenX = (canvas.width * 0.5) + (currentP.y * sc * VS);
+                const ballScreenY = (hY + (gR * sc)) - (currentP.z * sc * VS);
+                const groundYAtBall = hY + (gR * sc);
+
+                // Ombre réaliste projetée au sol
+                const shadowRadius = Math.max(1.5, 7 * sc);
+                const shadowOpacity = Math.max(0.08, 0.40 - (currentP.z * 0.012));
+                ctx.fillStyle = `rgba(0, 0, 0, ${shadowOpacity})`;
+                ctx.beginPath();
+                ctx.ellipse(ballScreenX, groundYAtBall, shadowRadius * 1.5, shadowRadius * 0.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Balle
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(ballScreenX, ballScreenY, Math.max(2, 6 * sc), 0, Math.PI * 2);
+                ctx.fill();
             }
         }
         frame += 2;
@@ -609,6 +790,10 @@ window.addHistoryItem = function (type, result) {
     };
     appState.history.unshift(item);
     localStorage.setItem('golf_history', JSON.stringify(appState.history));
+    renderHistory();
+};
+
+window.renderHistory = function() {
     renderHistory();
 };
 

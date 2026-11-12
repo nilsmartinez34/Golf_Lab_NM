@@ -43,6 +43,20 @@ window.initPuttUI = function () {
         window.updatePuttUI();
     };
 
+    // Open History Modal from Putt Menu or History Label
+    const openHistory = () => {
+        if (window.renderHistory) window.renderHistory();
+        const hm = document.getElementById('history-modal');
+        if (hm) hm.style.display = 'flex';
+    };
+    const bMenu = document.querySelector('.putt-actions-top .menu-btn');
+    if (bMenu) bMenu.onclick = openHistory;
+    const lblHistory = document.querySelector('.putt-sub-overlay .top-right');
+    if (lblHistory) {
+        lblHistory.style.cursor = 'pointer';
+        lblHistory.onclick = openHistory;
+    }
+
     window.updatePuttUI();
 };
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'golf-lab-v3';
+const CACHE_NAME = 'golf-lab-v4';
 const urlsToCache = [
     './',
     './index.html',
@@ -9,12 +9,15 @@ const urlsToCache = [
     './js/swing_logic.js',
     './js/chip_logic.js',
     './js/putt_logic.js',
+    './js/putting_view_3d.js',
     './src/html/swing_ui.html',
     './src/html/chip_ui.html',
     './src/html/putt_ui.html',
+    './src/html/game_ui.html',
+    './js/game_logic.js',
     './components/modals.html',
     './manifest.json',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap'
+    './ico.png'
 ];
 
 // Install event - cache resources
@@ -32,15 +35,14 @@ self.addEventListener('install', (event) => {
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
     event.respondWith(
-        caches.match(event.request)
+        caches.match(event.request, { ignoreSearch: true })
             .then((response) => {
                 // Cache hit - return response
                 if (response) {
                     return response;
                 }
                 return fetch(event.request);
-            }
-            )
+            })
     );
 });
 

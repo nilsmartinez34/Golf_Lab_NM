@@ -1,4 +1,4 @@
-const PhysicsEngine = require('./physics_ultimate.js');
+const PhysicsEngine = require('./js/physics_ultimate.js');
 const club = PhysicsEngine.GOLF_BAG['PW'];
 const params = PhysicsEngine.calculateLaunchParams({ clubSpeedMph: 25, efficiency: 1, powerFactor: 1, pathDeviationDeg: 0, clubFaceAngle: 0 }, club);
 

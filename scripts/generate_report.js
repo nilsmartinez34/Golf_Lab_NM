@@ -1,4 +1,4 @@
-const PhysicsEngine = require('../physics_ultimate');
+const PhysicsEngine = require('../js/physics_ultimate');
 const fs = require('fs');
 
 const clubs = Object.keys(PhysicsEngine.GOLF_BAG);

@@ -19,18 +19,18 @@ const CONSTANTS = {
 
 // --- GOLF BAG CONFIGURATION ---
 const GOLF_BAG = {
-    'Dr': { loft: 10.5, mass: 200, length: 45.75, smashFactor: 1.49, attackAngle: 3.0, efficiency: 1.0 },
-    '3W': { loft: 15.0, mass: 210, length: 43.25, smashFactor: 1.47, attackAngle: -1.0, efficiency: 0.99 },
-    '4i': { loft: 21.0, mass: 249, length: 38.50, smashFactor: 1.43, attackAngle: -2.5, efficiency: 0.97 },
-    '5i': { loft: 24.0, mass: 256, length: 38.00, smashFactor: 1.39, attackAngle: -3.0, efficiency: 0.96 },
-    '6i': { loft: 27.0, mass: 263, length: 37.50, smashFactor: 1.36, attackAngle: -3.5, efficiency: 0.95 },
-    '7i': { loft: 30.5, mass: 270, length: 37.00, smashFactor: 1.33, attackAngle: -4.0, efficiency: 0.94 },
-    '8i': { loft: 35.0, mass: 277, length: 36.50, smashFactor: 1.29, attackAngle: -4.5, efficiency: 0.93 },
-    '9i': { loft: 39.5, mass: 284, length: 36.00, smashFactor: 1.25, attackAngle: -5.0, efficiency: 0.92 },
-    'PW': { loft: 44.0, mass: 291, length: 35.75, smashFactor: 1.20, attackAngle: -5.5, efficiency: 0.91 },
-    'SW': { loft: 54.0, mass: 305, length: 35.50, smashFactor: 1.08, attackAngle: -6.0, efficiency: 0.88 },
-    'LW': { loft: 58.0, mass: 310, length: 35.25, smashFactor: 1.00, attackAngle: -6.0, efficiency: 0.85 },
-    'Put': { loft: 3.5, mass: 330, length: 34.00, smashFactor: 1.00, attackAngle: 0.0, efficiency: 1.00 }
+    'Dr': { loft: 10.5, mass: 200, length: 45.75, smashFactor: 1.49, attackAngle: 3.0, efficiency: 1.0, standardSpeedMph: 105 },
+    '3W': { loft: 15.0, mass: 210, length: 43.25, smashFactor: 1.47, attackAngle: -1.0, efficiency: 0.99, standardSpeedMph: 100 },
+    '4i': { loft: 21.0, mass: 249, length: 38.50, smashFactor: 1.43, attackAngle: -2.5, efficiency: 0.97, standardSpeedMph: 92 },
+    '5i': { loft: 24.0, mass: 256, length: 38.00, smashFactor: 1.39, attackAngle: -3.0, efficiency: 0.96, standardSpeedMph: 90 },
+    '6i': { loft: 27.0, mass: 263, length: 37.50, smashFactor: 1.36, attackAngle: -3.5, efficiency: 0.95, standardSpeedMph: 88 },
+    '7i': { loft: 30.5, mass: 270, length: 37.00, smashFactor: 1.33, attackAngle: -4.0, efficiency: 0.94, standardSpeedMph: 85 },
+    '8i': { loft: 35.0, mass: 277, length: 36.50, smashFactor: 1.29, attackAngle: -4.5, efficiency: 0.93, standardSpeedMph: 82 },
+    '9i': { loft: 39.5, mass: 284, length: 36.00, smashFactor: 1.25, attackAngle: -5.0, efficiency: 0.92, standardSpeedMph: 80 },
+    'PW': { loft: 44.0, mass: 291, length: 35.75, smashFactor: 1.20, attackAngle: -5.5, efficiency: 0.91, standardSpeedMph: 78 },
+    'SW': { loft: 54.0, mass: 305, length: 35.50, smashFactor: 1.08, attackAngle: -6.0, efficiency: 0.88, standardSpeedMph: 75 },
+    'LW': { loft: 58.0, mass: 310, length: 35.25, smashFactor: 1.00, attackAngle: -6.0, efficiency: 0.85, standardSpeedMph: 72 },
+    'Put': { loft: 3.5, mass: 330, length: 34.00, smashFactor: 1.00, attackAngle: 0.0, efficiency: 1.00, standardSpeedMph: 5 }
 };
 
 const Vec3 = {
@@ -90,6 +90,115 @@ class PhysicsEngine {
             smashFactor: club.smashFactor,
             attackAngle: attackAngle
         };
+    }
+
+    /**
+     * Calcule le niveau de risque et d'altération selon la force demandée.
+     * Règle : 0% d'altération de 0% à 90% de force.
+     * Entre 90% et 100% (les 10% finaux), l'altération maximale monte progressivement de 0% à +/-5% en aléatoire.
+     */
+    static calculateRiskFactor(club, speedMph, lie = 'fairway') {
+        const refSpeed = club.standardSpeedMph || 85;
+        // On considère 110% de la vitesse de référence comme le plafond 100% de force
+        const maxSpeed = refSpeed * 1.10;
+        const powerRatio = Math.min(1.15, speedMph / maxSpeed);
+
+        let maxVariationPercent = 0.0;
+        if (powerRatio > 0.90) {
+            // Progression de 0 à 1 entre 90% et 100%
+            const t = Math.min(1.0, (powerRatio - 0.90) / 0.10);
+            maxVariationPercent = 0.05 * t; // jusqu'à +/- 5% à 100%
+        }
+
+        let riskLevel = 'sweet_spot';
+        if (powerRatio > 0.98) riskLevel = 'extreme';
+        else if (powerRatio > 0.90) riskLevel = 'danger';
+
+        let lieMultiplier = 1.0;
+        if (lie === 'rough') lieMultiplier = 1.25;
+        else if (lie === 'sand') lieMultiplier = 1.5;
+        else if (lie === 'tee') lieMultiplier = 0.9;
+
+        return {
+            powerRatio,
+            refSpeed,
+            maxSpeed,
+            maxVariationPercent, // e.g. 0.0 à 0.05 (0% à 5%)
+            riskLevel,
+            lieMultiplier
+        };
+    }
+
+    /**
+     * Calcule les paramètres de départ avec incertitude stochastique (Mode Jeu)
+     * Règle utilisateur : 0% d'altération jusqu'à 90% de force, puis aléatoire de 0% à +/-5% à 100%.
+     */
+    static calculateGameLaunchParams(input, club, options = {}) {
+        const lie = options.lie || 'fairway';
+        const manualAttack = options.manualAttackAngle !== undefined ? options.manualAttackAngle : null;
+        const risk = this.calculateRiskFactor(club, input.clubSpeedMph, lie);
+
+        // Tirage aléatoire uniforme entre -1 et +1
+        const rnd = () => (Math.random() * 2.0) - 1.0;
+
+        // Facteur d'altération aléatoire [ -maxVariationPercent, +maxVariationPercent ]
+        const maxVar = risk.maxVariationPercent * risk.lieMultiplier;
+        const smashVariation = rnd() * maxVar; // ex: +/- 5% à 100%
+        const faceVariationDeg = rnd() * (maxVar * 50); // à 5% -> +/- 2.5°
+        const pathVariationDeg = rnd() * (maxVar * 40); // à 5% -> +/- 2.0°
+        const spinVariation = rnd() * maxVar;
+
+        // Smash effectif altéré en aléatoire
+        let effectiveSmash = club.smashFactor * (1.0 + smashVariation);
+        effectiveSmash = Math.max(0.65, Math.min(1.52, effectiveSmash));
+
+        // Pénalités spécifiques au Lie
+        let efficiencyModifier = input.efficiency || 1.0;
+        let spinMultiplier = 1.0 + spinVariation;
+
+        if (lie === 'rough') {
+            efficiencyModifier *= (0.88 - Math.random() * 0.07);
+            spinMultiplier *= (0.75 + Math.random() * 0.15);
+        } else if (lie === 'sand') {
+            efficiencyModifier *= (0.72 - Math.random() * 0.12);
+            spinMultiplier *= (1.15 + Math.random() * 0.15);
+        }
+
+        const effectiveFace = input.clubFaceAngle + faceVariationDeg;
+        const effectivePath = input.pathDeviationDeg + pathVariationDeg;
+        const nominalAttack = manualAttack !== null ? manualAttack : club.attackAngle;
+        const effectiveAttack = nominalAttack + (rnd() * maxVar * 20);
+
+        const effectiveInput = {
+            clubSpeedMph: input.clubSpeedMph,
+            powerFactor: input.powerFactor || 1.0,
+            efficiency: efficiencyModifier,
+            pathDeviationDeg: effectivePath,
+            clubFaceAngle: effectiveFace
+        };
+
+        const effectiveClub = {
+            ...club,
+            smashFactor: effectiveSmash
+        };
+
+        const baseLaunch = this.calculateLaunchParams(effectiveInput, effectiveClub, effectiveAttack);
+        baseLaunch.totalSpinRpm *= spinMultiplier;
+        baseLaunch.backSpinRpm *= spinMultiplier;
+
+        // Données d'incertitude transmises à l'UI pour affichage
+        baseLaunch.gameContext = {
+            lie,
+            powerRatio: risk.powerRatio,
+            maxVariationPercent: risk.maxVariationPercent,
+            variationPercentApplied: smashVariation * 100,
+            riskLevel: risk.riskLevel,
+            faceDeviationDeg: faceVariationDeg,
+            pathDeviationDeg: pathVariationDeg,
+            effectiveSmash: effectiveSmash
+        };
+
+        return baseLaunch;
     }
 
     static calculateAirDensity(alt, temp) {

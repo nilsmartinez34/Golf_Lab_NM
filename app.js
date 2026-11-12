@@ -99,6 +99,8 @@ window.switchMode = async function (mode) {
             window.initChipUI();
         } else if (mode === 'putt' && window.initPuttUI) {
             window.initPuttUI();
+        } else if (mode === 'game' && window.initGameUI) {
+            window.initGameUI();
         } else {
             console.warn(`No init function found for mode: ${mode}`);
         }

@@ -151,6 +151,7 @@ class PuttingView3D {
     }
 
     startPuttAnimation(trajectoryData) {
+        if (!this.isInitialized) return;
         this.animationData = trajectoryData;
         this.frameIndex = 0;
 
