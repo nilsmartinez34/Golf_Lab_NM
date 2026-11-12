@@ -4,7 +4,6 @@ package-lock.json
 
 # Rust & WASM build artifacts
 target/
-pkg/
 **/*.rs.bk
 
 # OS & Editor
